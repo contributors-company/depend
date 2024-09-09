@@ -1,9 +1,15 @@
 part of 'dependencies.dart';
 
+/// The `DependenciesInit` class is responsible for initializing the
+/// dependencies and the environment store.
 class DependenciesInit {
+  /// The dependencies library.
   final DependenciesLibrary dependencies = {};
+
+  /// The environment store.
   final EnvironmentStore? environmentStore;
 
+  /// Initialize the dependencies.
   DependenciesInit({
     this.environmentStore,
     required List<DependenciesProgress> progress,

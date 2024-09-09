@@ -1,4 +1,4 @@
-import 'package:dependencies/dependencies.dart';
+import 'package:depend/depend.dart';
 import 'package:flutter/material.dart';
 
 List<DependenciesProgress> progress = [

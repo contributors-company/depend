@@ -1,7 +1,7 @@
-name: dependencies
-description: "A new Flutter project."
-version: 0.0.1
-homepage:
+name: depend
+description: "Dep for your Flutter project."
+version: 1.0.0
+homepage: https://github.com/AlexHCJP/depend
 
 environment:
   sdk: '>=3.4.4 <4.0.0'

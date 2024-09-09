@@ -32,7 +32,7 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  dependencies: ^0.0.1
+  depend: ^0.0.1
 ```
 
 Then run:
