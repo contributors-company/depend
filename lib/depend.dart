@@ -1,3 +1,3 @@
-library dep;
+library;
 
 export 'src/dependencies.dart';

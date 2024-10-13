@@ -10,7 +10,7 @@ typedef EnvironmentStore = Map<String, dynamic>;
 
 /// The `DependenciesProgress` class is responsible for initializing the
 /// dependencies and the environment store.
-typedef DependenciesProgress<T extends Dependency> = T Function(
+typedef DependenciesProgress<T extends Dependency> = Future<T> Function(
     InitializationProgress progress);
 
 /// The `Dependency` class is a base class for all dependencies.

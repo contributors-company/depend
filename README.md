@@ -52,8 +52,8 @@ Start by creating a list of dependencies that will be initialized when your app 
 
 ```dart
 List<DependenciesProgress> progress = [
-  (progress) => ApiService(), // Example of an independent dependency
-  (progress) {
+  (progress) async => ApiService(), // Example of an independent dependency
+  (progress) async {
     return AuthRepository(
       dataSource: AuthDataSource(
         apiService: progress.dependencies.get<ApiService>(),
@@ -68,12 +68,12 @@ List<DependenciesProgress> progress = [
 Use `DependenciesInit` to initialize your dependencies before launching the app:
 
 ```dart
-void main() {
-  final init = DependenciesInit(progress: progress);
+void main() async {
+  final dependencies = await DependenciesInit(progress: progress);
 
   runApp(
     MyApp(
-      dependencies: init.dependencies,
+      dependencies: dependencies,
     ),
   );
 }
@@ -173,8 +173,8 @@ In this example:
 During initialization, each dependency logs the time it took to initialize:
 
 ```dart
-💡 ApiService: initialized successfully for 500 ms
-💡 AuthRepository: initialized successfully for 10 ms
+💡 ApiService: initialized successfully for 10 ms
+💡 AuthRepository: initialized successfully for 0 ms
 ```
 
 This is useful for tracking performance and initialization times.

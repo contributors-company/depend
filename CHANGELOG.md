@@ -1,11 +1,18 @@
-## 0.0.1
+## 1.0.2
 
-* Initial release.
+* Fix async bugs
+
+## 1.0.1
+
+* New Description
 
 ## 1.0.0
 
 * Add new feature.
 
-## 1.0.1
 
-* New Description
+## 0.0.1
+
+* Initial release.
+
+

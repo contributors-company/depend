@@ -2,8 +2,8 @@ import 'package:depend/depend.dart';
 import 'package:flutter/material.dart';
 
 List<DependenciesProgress> progress = [
-  (progress) => ApiService(),
-  (progress) {
+  (progress) async => ApiService(),
+  (progress) async {
     return AuthRepository(
       dataSource: AuthDataSource(
         apiService: progress.dependencies.get<ApiService>(),
@@ -12,12 +12,12 @@ List<DependenciesProgress> progress = [
   },
 ];
 
-void main() {
-  final init = DependenciesInit(progress: progress);
+void main() async {
+  final dependencies = await DependenciesInit().init(progress: progress);
 
   runApp(
     MyApp(
-      dependencies: init.dependencies,
+      dependencies: dependencies,
     ),
   );
 }

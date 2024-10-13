@@ -12,8 +12,11 @@ class DependenciesInit {
   /// Initialize the dependencies.
   DependenciesInit({
     this.environmentStore,
+  });
+
+  Future<DependenciesLibrary> init({
     required List<DependenciesProgress> progress,
-  }) {
+  }) async {
     for (final progress in progress) {
       final stopWatch = Stopwatch()..start();
 
@@ -23,7 +26,7 @@ class DependenciesInit {
       ));
 
       dependencies.addAll({
-        dependency.runtimeType: dependency,
+        dependency.runtimeType: await dependency,
       });
 
       stopWatch.stop();
@@ -31,5 +34,6 @@ class DependenciesInit {
       debugPrint(
           '💡 ${dependency.runtimeType}: initialized successfully for ${stopWatch.elapsedMilliseconds} ms');
     }
+    return dependencies;
   }
 }
