@@ -95,43 +95,51 @@ class MyApp extends StatelessWidget {
       dependencies: dependencies,
       child: MaterialApp(
         title: 'Flutter Demo',
-        home: MyHomePage(),
+        home: BlocProvider(
+          create: (context) => DefaultBloc(
+            Dependencies.of(context).get<AuthRepository>(),
+          ),
+          child: MyHomePage(),
+        ),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool isLogin = false;
-
   void _login() {
-    try {
-      Dependencies.of(context).get<AuthRepository>().login();
-      setState(() {
-        isLogin = true;
-      });
-    } catch (err) {
-      print(err);
-    }
+    context.read<DefaultBloc>().add(DefaultEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Text('Login: $isLogin'),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              BlocBuilder<DefaultBloc, DefaultState>(
+                builder: (context, state) {
+                  return Text('Login: ${state.authorized}');
+                },
+              ),
+              Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: _login,
+                    child: const Text('Login'),
+                  );
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -145,20 +153,26 @@ You can also use `dependencies` with `Bloc` for state management. Here’s an ex
 
 ```dart
 /// Authentication BLoC
-class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository authRepository;
 
-  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
-    on<LoginRequested>(_login);
+class DefaultBloc extends Bloc<DefaultEvent, DefaultState> {
+  final AuthRepository _authRepository;
+
+  DefaultBloc(this._authRepository) : super(DefaultState()) {
+    on<DefaultEvent>((event, emit) {
+      _authRepository.login();
+      emit(DefaultState(authorized: true));
+    });
   }
 }
+
 ```
 
 ```dart
 BlocProvider(
-    create: (context) => AuthBloc(
-      authRepository: Dependencies.of(context).get<AuthRepository>(),
+    create: (context) => DefaultBloc(
+      Dependencies.of(context).get<AuthRepository>(),
     ),
+    child: MyWidget(),
 ),
 ```
 

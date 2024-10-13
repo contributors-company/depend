@@ -1,3 +1,7 @@
+## 1.0.4
+
+* Fix bugs
+
 ## 1.0.3
 
 * Fix documentation

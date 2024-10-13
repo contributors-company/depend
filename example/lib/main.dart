@@ -1,5 +1,7 @@
 import 'package:depend/depend.dart';
+import 'package:example/default_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 List<DependenciesProgress> progress = [
   (progress) async => ApiService(),
@@ -24,9 +26,7 @@ void main() async {
 
 /// The API service for the example
 class ApiService extends Dependency {
-  ApiService() {
-    for (var i = 0; i < 1000000000; i++) {}
-  }
+  ApiService();
 }
 
 /// The data source for the example
@@ -49,15 +49,21 @@ final class AuthRepository extends Dependency {
 
 class MyApp extends StatelessWidget {
   final DependenciesLibrary dependencies;
+
   const MyApp({super.key, required this.dependencies});
 
   @override
   Widget build(BuildContext context) {
     return Dependencies(
       dependencies: dependencies,
-      child: const MaterialApp(
+      child: MaterialApp(
         title: 'Flutter Demo',
-        home: MyHomePage(),
+        home: BlocProvider(
+          create: (context) => DefaultBloc(
+            Dependencies.of(context).get<AuthRepository>(),
+          ),
+          child: const MyHomePage(),
+        ),
       ),
     );
   }
@@ -71,14 +77,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool isLogin = false;
-
   void _login() {
-    Dependencies.of(context).get<AuthRepository>().login().then((value) {
-      setState(() {
-        isLogin = true;
-      });
-    });
+    context.read<DefaultBloc>().add(DefaultEvent());
   }
 
   @override
@@ -88,7 +88,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Text('Login: $isLogin'),
+              BlocBuilder<DefaultBloc, DefaultState>(
+                builder: (context, state) {
+                  return Text('Login: ${state.authorized}');
+                },
+              ),
               Builder(
                 builder: (context) {
                   return ElevatedButton(

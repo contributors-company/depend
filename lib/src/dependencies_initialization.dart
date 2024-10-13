@@ -20,13 +20,13 @@ class DependenciesInit {
     for (final progress in progress) {
       final stopWatch = Stopwatch()..start();
 
-      final dependency = progress(InitializationProgress(
+      final dependency = await progress(InitializationProgress(
         dependencies: dependencies,
         environmentStore: environmentStore ?? {},
       ));
 
       dependencies.addAll({
-        dependency.runtimeType: await dependency,
+        dependency.runtimeType: dependency,
       });
 
       stopWatch.stop();
