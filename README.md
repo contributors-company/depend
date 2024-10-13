@@ -69,7 +69,7 @@ Use `DependenciesInit` to initialize your dependencies before launching the app:
 
 ```dart
 void main() async {
-  final dependencies = await DependenciesInit(progress: progress);
+  final dependencies = await DependenciesInit().init(progress: progress);
 
   runApp(
     MyApp(

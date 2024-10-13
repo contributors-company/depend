@@ -1,6 +1,6 @@
 name: depend
 description: "Dependencies is a library for managing dependencies in Flutter applications. It provides a convenient way to initialize and access services or repositories via an InheritedWidget."
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/AlexHCJP/depend
 
 environment:
