@@ -52,16 +52,11 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
     super.key,
     this.placeholder,
   }) {
-    try {
-      library.init().then((val) {
-        _completer.complete(library);
-      }).catchError((Object error) {
-        _completer.completeError(error, StackTrace.current);
-      });
-    } catch (error) {
-      // Catch synchronous errors
-      _completer.completeError(error);
-    }
+    library.init().then((val) {
+      _completer.complete(library);
+    }).catchError((Object error) {
+      _completer.completeError(error, StackTrace.current);
+    });
   }
 
   final Completer<T> _completer = Completer<T>();
