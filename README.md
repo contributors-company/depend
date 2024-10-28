@@ -234,4 +234,4 @@ This is useful for tracking performance and initialization times.
 
 ## Codecov
 
-![Codecov](https://codecov.io/github/contributors-company/deoend/graphs/sunburst.svg?token=FY0FEJJRDX)
+![Codecov](https://codecov.io/gh/contributors-company/depend/graphs/sunburst.svg?token=DITZJ9E9OM)
