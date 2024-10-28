@@ -1,7 +1,16 @@
 
-# dependencies
+# depend
 
-`dependencies` is a library for managing dependencies in Flutter applications. It provides a convenient way to initialize and access services or repositories via an `InheritedWidget`.
+![Pub Version](https://img.shields.io/pub/v/depend)
+![License](https://img.shields.io/github/license/AlexHCJP/depend)
+![Issues](https://img.shields.io/github/issues/AlexHCJP/depend)
+![Coverage](https://img.shields.io/codecov/c/github/contributors-company/depend)
+![Stars](https://img.shields.io/github/stars/AlexHCJP/depend)
+![Contributors](https://img.shields.io/github/contributors/AlexHCJP/depend)
+![Watchers](https://img.shields.io/github/watchers/AlexHCJP/depend)
+![Forks](https://img.shields.io/github/forks/AlexHCJP/depend)
+
+`depend` is a library for managing dependencies in Flutter applications. It provides a convenient way to initialize and access services or repositories via an `InheritedWidget`.
 
 ---
 
@@ -19,12 +28,12 @@
     - [Why it Rocks 🚀](#why-it-rocks-)
     - [Installation](#installation)
     - [Example Usage](#example-usage)
-        - [Example 1: Create a List of Dependencies](#step-1-create-a-list-of-dependencies)
-        - [Step 2: Initialize Dependencies](#step-2-initialize-dependencies)
-        - [Step 3: Access Dependencies with `InheritedWidget`](#step-3-access-dependencies-with-inheritedwidget)
-        - [Example 2: Example Usage with `Bloc`](#step-4-example-usage-with-bloc)
+        - [Example 1: Define Dependencies](#example-1-define-dependencies)
+          - [Step 2: Initialize Dependencies](#step-2-initialize-dependencies)
+          - [Step 3: Access Dependencies with `InheritedWidget`](#step-3-access-dependencies-with-inheritedwidget)
+        - [Example 2: Use Parent Dependencies](#example-2-use-parent-dependencies)
+          - [Step 1: Define Parent Dependencies](#step-1-define-parent-dependencies)
     - [Logging and Debugging](#logging-and-debugging)
-    - [Conclusion](#conclusion)
 
 ## Installation
 
@@ -46,21 +55,19 @@ $ flutter pub get
 
 ### Example 1: Define Dependencies
 
-#### Step 1: Create a List of Dependencies
+#### Step 1: Extends `DependenciesLibrary`
 
-Start by creating a list of dependencies that will be initialized when your app starts. Each dependency can rely on another through `DependenciesProgress`:
+Create a `DependenciesLibrary` that extends `DependenciesLibrary` and initializes your dependencies:
 
 ```dart
-List<DependenciesProgress> progress = [
-  (progress) async => ApiService(), // Example of an independent dependency
-  (progress) async {
-    return AuthRepository(
-      dataSource: AuthDataSource(
-        apiService: progress.dependencies.get<ApiService>(),
-      ),
-    );
-  },
-];
+class RootLibrary extends DependenciesLibrary {
+  late final ApiService apiService;
+
+  @override
+  Future<void> init() async {
+    await log(() async => apiService = await ApiService().init());
+  }
+}
 ```
 
 #### Step 2: Initialize Dependencies
@@ -68,12 +75,15 @@ List<DependenciesProgress> progress = [
 Use `DependenciesInit` to initialize your dependencies before launching the app:
 
 ```dart
-void main() async {
-  final dependencies = await DependenciesInit().init(progress: progress);
-
+void main() {
   runApp(
-    MyApp(
-      dependencies: dependencies,
+    Dependencies<RootLibrary>(
+      library: RootLibrary(),
+      placeholder: const ColoredBox(
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      child: const MyApp(),
     ),
   );
 }
@@ -81,25 +91,35 @@ void main() async {
 
 #### Step 3: Access Dependencies with `InheritedWidget`
 
-Once initialized, dependencies can be accessed from anywhere in the widget tree using `Dependencies.of(context).get<T>()`:
+Once initialized, dependencies can be accessed from anywhere in the widget tree using `Dependencies.of(context).authRepository`:
 
 ```dart
-class MyApp extends StatelessWidget {
-  final DependenciesLibrary dependencies;
 
-  const MyApp({super.key, required this.dependencies});
+/// The repository for the example
+final class AuthRepository {
+  final AuthDataSource dataSource;
+
+  AuthRepository({required this.dataSource});
+
+  Future<String> login() => dataSource.login();
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dependencies(
-      dependencies: dependencies,
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        home: BlocProvider(
+    return MaterialApp(
+      title: 'Flutter Demo',
+      home: Dependencies<ModuleLibrary>(
+        library: ModuleLibrary(
+          parent: Dependencies.of<RootLibrary>(context),
+        ),
+        child: BlocProvider(
           create: (context) => DefaultBloc(
-            Dependencies.of(context).get<AuthRepository>(),
+            Dependencies.of<ModuleLibrary>(context).authRepository,
           ),
-          child: MyHomePage(),
+          child: const MyHomePage(),
         ),
       ),
     );
@@ -145,46 +165,65 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
 ```
 
-### Example 2: Example Usage with `Bloc`
+### Example 2: Use Parent Dependencies
 
-You can also use `dependencies` with `Bloc` for state management. Here’s an example where the `AuthRepository` is injected into an `AuthBloc`:
+#### Step 1: Define Parent Dependencies
 
 ```dart
-/// Authentication BLoC
 
-class DefaultBloc extends Bloc<DefaultEvent, DefaultState> {
-  final AuthRepository _authRepository;
+class RootLibrary extends DependenciesLibrary {
+  late final ApiService apiService;
 
-  DefaultBloc(this._authRepository) : super(DefaultState()) {
-    on<DefaultEvent>((event, emit) {
-      _authRepository.login();
-      emit(DefaultState(authorized: true));
-    });
+  @override
+  Future<void> init() async {
+    apiService = await ApiService().init();
   }
 }
 
+class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
+  late final AuthRepository authRepository;
+
+  ModuleLibrary({required super.parent});
+
+  @override
+  Future<void> init() async {
+    // initialize dependencies
+    
+    authRepository = AuthRepository(
+      dataSource: AuthDataSource(
+        apiService: parent.apiService, // parent - RootLibrary
+      ),
+    );
+  }
+}
+
+
+
 ```
-
-```dart
-BlocProvider(
-    create: (context) => DefaultBloc(
-      Dependencies.of(context).get<AuthRepository>(),
-    ),
-    child: MyWidget(),
-),
-```
-
-
-In this example:
-- We create an `AuthBloc` that depends on `AuthRepository` (which is initialized through the `dependencies` library).
-- The `AuthBloc` is provided using `BlocProvider`, and we inject the `AuthRepository` from the dependencies into the BLoC.
-- The UI responds to authentication events and displays different states like `AuthSuccess` or `AuthFailure`.
 
 ## Logging and Debugging
 
 During initialization, each dependency logs the time it took to initialize:
+
+```dart
+class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
+  late final AuthRepository authRepository;
+
+  ModuleLibrary({required super.parent});
+
+  @override
+  Future<void> init() async {
+    await log(() async => authRepository = AuthRepository(
+          dataSource: AuthDataSource(
+            apiService: parent.apiService,
+          ),
+        ));
+  }
+}
+```
 
 ```dart
 💡 ApiService: initialized successfully for 10 ms
@@ -193,6 +232,6 @@ During initialization, each dependency logs the time it took to initialize:
 
 This is useful for tracking performance and initialization times.
 
-## Conclusion
+## Codecov
 
-The `dependencies` library provides a clean and extensible way to manage dependencies in your Flutter app, including integration with `Bloc` for state management.
+![Codecov](https://codecov.io/github/contributors-company/deoend/graphs/sunburst.svg?token=FY0FEJJRDX)
