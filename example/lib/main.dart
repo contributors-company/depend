@@ -3,30 +3,50 @@ import 'package:example/default_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-List<DependenciesProgress> progress = [
-  (progress) async => ApiService(),
-  (progress) async {
-    return AuthRepository(
-      dataSource: AuthDataSource(
-        apiService: progress.dependencies.get<ApiService>(),
-      ),
-    );
-  },
-];
+class RootLibrary extends DependenciesLibrary {
+  late final ApiService apiService;
 
-void main() async {
-  final dependencies = await DependenciesInit().init(progress: progress);
+  @override
+  Future<void> init() async {
+    await log(() async => apiService = await ApiService().init());
+  }
+}
 
+class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
+  late final AuthRepository authRepository;
+
+  ModuleLibrary({required super.parent});
+
+  @override
+  Future<void> init() async {
+    await log(() async => authRepository = AuthRepository(
+          dataSource: AuthDataSource(
+            apiService: parent.apiService,
+          ),
+        ));
+  }
+}
+
+void main() {
   runApp(
-    MyApp(
-      dependencies: dependencies,
+    Dependencies<RootLibrary>(
+      library: RootLibrary(),
+      placeholder: const ColoredBox(
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      child: const MyApp(),
     ),
   );
 }
 
 /// The API service for the example
-class ApiService extends Dependency {
+class ApiService {
   ApiService();
+
+  Future<ApiService> init() async {
+    return Future.delayed(const Duration(seconds: 1), () => this);
+  }
 }
 
 /// The data source for the example
@@ -39,7 +59,7 @@ class AuthDataSource {
 }
 
 /// The repository for the example
-final class AuthRepository extends Dependency {
+final class AuthRepository {
   final AuthDataSource dataSource;
 
   AuthRepository({required this.dataSource});
@@ -48,19 +68,19 @@ final class AuthRepository extends Dependency {
 }
 
 class MyApp extends StatelessWidget {
-  final DependenciesLibrary dependencies;
-
-  const MyApp({super.key, required this.dependencies});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dependencies(
-      dependencies: dependencies,
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        home: BlocProvider(
+    return MaterialApp(
+      title: 'Flutter Demo',
+      home: Dependencies<ModuleLibrary>(
+        library: ModuleLibrary(
+          parent: Dependencies.of<RootLibrary>(context),
+        ),
+        child: BlocProvider(
           create: (context) => DefaultBloc(
-            Dependencies.of(context).get<AuthRepository>(),
+            Dependencies.of<ModuleLibrary>(context).authRepository,
           ),
           child: const MyHomePage(),
         ),

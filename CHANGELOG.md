@@ -1,3 +1,7 @@
+## 2.0.0
+
+* Fix bugs, Add new feature, parent dependency
+
 ## 1.0.4
 
 * Fix bugs
