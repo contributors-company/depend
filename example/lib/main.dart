@@ -1,5 +1,5 @@
 import 'package:depend/depend.dart';
-import 'package:example/default_bloc.dart';
+import 'package:example/src/default_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

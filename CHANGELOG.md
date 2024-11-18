@@ -1,3 +1,8 @@
+## 2.0.2
+
+* Fix Example
+
+
 ## 2.0.1
 
 * Add dispose for DependencyLibrary
