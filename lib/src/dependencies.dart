@@ -165,7 +165,6 @@ class _DisposeDependency<T extends DependenciesLibrary<Object?>>
 
 class _DisposeDependencyState<T extends DependenciesLibrary<Object?>>
     extends State<_DisposeDependency<T>> {
-
   @override
   void dispose() {
     super.dispose();
