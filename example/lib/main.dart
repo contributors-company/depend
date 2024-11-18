@@ -10,6 +10,11 @@ class RootLibrary extends DependenciesLibrary {
   Future<void> init() async {
     await log(() async => apiService = await ApiService().init());
   }
+
+  @override
+  dispose() {
+
+  }
 }
 
 class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
@@ -23,7 +28,13 @@ class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
           dataSource: AuthDataSource(
             apiService: parent.apiService,
           ),
-        ));
+        ),
+    );
+  }
+
+  @override
+  void dispose() {
+    authRepository.dispose();
   }
 }
 
@@ -65,6 +76,10 @@ final class AuthRepository {
   AuthRepository({required this.dataSource});
 
   Future<String> login() => dataSource.login();
+
+  void dispose() {
+    // stream.close();
+  }
 }
 
 class MyApp extends StatelessWidget {

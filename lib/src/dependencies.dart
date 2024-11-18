@@ -53,13 +53,14 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
     this.placeholder,
   }) {
     library.init().then((val) {
-      _completer.complete(library);
+      completer.complete(library);
     }).catchError((Object error) {
-      _completer.completeError(error, StackTrace.current);
+      completer.completeError(error, StackTrace.current);
     });
   }
 
-  final Completer<T> _completer = Completer<T>();
+  /// A [Completer] to handle the asynchronous initialization of the [library].
+  final Completer<T> completer = Completer<T>();
 
   /// The instance of [DependenciesLibrary] to provide to the widget tree.
   final T library;
@@ -123,7 +124,7 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
 
   @override
   Widget get child => FutureBuilder<T>(
-        future: _completer.future,
+        future: completer.future,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return ErrorWidget(snapshot.error!);
@@ -132,9 +133,16 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return placeholder ?? super.child;
+              return placeholder ??
+                  _DisposeDependency<T>(
+                    library: library,
+                    child: super.child,
+                  );
             case ConnectionState.done:
-              return super.child;
+              return _DisposeDependency<T>(
+                library: library,
+                child: super.child,
+              );
           }
         },
       );
@@ -142,4 +150,28 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
   @override
   bool updateShouldNotify(Dependencies oldWidget) =>
       library != oldWidget.library;
+}
+
+class _DisposeDependency<T extends DependenciesLibrary<Object?>>
+    extends StatefulWidget {
+  const _DisposeDependency(
+      {required this.child, required this.library, super.key});
+
+  final T library;
+  final Widget child;
+
+  @override
+  State<_DisposeDependency> createState() => _DisposeDependencyState();
+}
+
+class _DisposeDependencyState<T extends DependenciesLibrary<Object?>>
+    extends State<_DisposeDependency<T>> {
+  @override
+  void dispose() {
+    super.dispose();
+    widget.library.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
