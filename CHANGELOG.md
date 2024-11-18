@@ -1,3 +1,7 @@
+## 2.0.3
+
+* Fix dispose
+
 ## 2.0.2
 
 * Fix Example

@@ -133,11 +133,7 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return placeholder ??
-                  _DisposeDependency<T>(
-                    library: library,
-                    child: super.child,
-                  );
+              return placeholder ?? super.child;
             case ConnectionState.done:
               return _DisposeDependency<T>(
                 library: library,
@@ -154,8 +150,11 @@ class Dependencies<T extends DependenciesLibrary<Object?>>
 
 class _DisposeDependency<T extends DependenciesLibrary<Object?>>
     extends StatefulWidget {
-  const _DisposeDependency(
-      {required this.child, required this.library, super.key});
+  const _DisposeDependency({
+    required this.child,
+    required this.library,
+    super.key,
+  });
 
   final T library;
   final Widget child;
@@ -166,6 +165,7 @@ class _DisposeDependency<T extends DependenciesLibrary<Object?>>
 
 class _DisposeDependencyState<T extends DependenciesLibrary<Object?>>
     extends State<_DisposeDependency<T>> {
+
   @override
   void dispose() {
     super.dispose();
