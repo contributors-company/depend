@@ -1,3 +1,7 @@
+## 2.0.1
+
+* Add dispose for DependencyLibrary
+
 ## 2.0.0
 
 * Fix bugs, Add new feature, parent dependency

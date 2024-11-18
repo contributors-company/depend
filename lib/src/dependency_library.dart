@@ -65,8 +65,31 @@ abstract class DependenciesLibrary<T> {
   /// ```
   @mustCallSuper
   Future<void> init();
-
   // coverage:ignore-start
+
+  /// Cleans up resources used by the dependencies.
+  ///
+  /// This method can be overridden to release any resources, close streams, or dispose
+  /// of objects that were initialized in the `init` method or elsewhere in the library.
+  ///
+  /// The base implementation is empty, so calling `super.dispose()` is optional unless
+  /// overridden by subclasses to include specific cleanup logic.
+  ///
+  /// ### Example
+  ///
+  /// ```dart
+  /// @override
+  /// void dispose() {
+  ///   // Close a stream controller
+  ///   myStreamController.close();
+  ///
+  ///   // Dispose of other resources
+  ///   someDependency.dispose();
+  ///
+  ///   super.dispose();
+  /// }
+  /// ```
+  void dispose() {}
 
   /// Logs the initialization process of a dependency.
   ///
