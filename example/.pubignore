@@ -5,3 +5,6 @@ web/
 macos/
 android/
 lib/src/
+
+pubspec.yaml
+README.md
