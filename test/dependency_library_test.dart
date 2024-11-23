@@ -1,22 +1,18 @@
-import 'package:depend/depend.dart'; // Замените на фактический путь
+import 'package:depend/depend.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class TestDependenciesLibrary
-    extends DependenciesLibrary<TestDependenciesLibrary> {
+class TestInjectionScopeLibrary extends Injection<TestInjectionScopeLibrary> {
   @override
   Future<void> init() async {
     // Имитируем инициализацию
-    await log(() async {
-      await Future.delayed(const Duration(milliseconds: 100), () {});
-      return null;
-    });
+    await Future.delayed(const Duration(milliseconds: 100), () {});
   }
 }
 
-class FaultyDependenciesLibrary
-    extends DependenciesLibrary<FaultyDependenciesLibrary> {
-  FaultyDependenciesLibrary();
+class FaultyInjectionScopeLibrary
+    extends Injection<FaultyInjectionScopeLibrary> {
+  FaultyInjectionScopeLibrary();
 
   @override
   Future<void> init() async {
@@ -27,18 +23,94 @@ class FaultyDependenciesLibrary
   }
 }
 
+class MockLibrary extends Injection<void> {
+  MockLibrary() : super();
+
+  @override
+  Future<void> init() async {}
+}
+
 void main() {
-  group('Dependencies Widget', () {
+  group('InjectionScope Widget', () {
+    testWidgets('maybeOf should find the library in the widget tree',
+        (tester) async {
+      // Создаем виджет, в котором обернут наш Dependencies.
+      await tester.pumpWidget(
+        InjectionScope<MockLibrary>(
+          injection: MockLibrary(),
+          child: Builder(
+            builder: (context) {
+              // Вызываем maybeOf внутри контекста, чтобы проверить извлечение.
+              final library =
+                  InjectionScope.maybeOf<MockLibrary>(context, listen: true);
+              expect(library, isNotNull);
+              return Container();
+            },
+          ),
+        ),
+      );
+    });
+
+    test('updateShouldNotify returns true when libraries are different', () {
+      final oldLibrary = MockLibrary();
+      final newLibrary = MockLibrary();
+
+      final oldDependencies = InjectionScope(
+        injection: oldLibrary,
+        child: const SizedBox(),
+      );
+
+      final newDependencies = InjectionScope(
+        injection: newLibrary,
+        child: const SizedBox(),
+      );
+
+      // Проверяем, что updateShouldNotify вернет true, если библиотеки разные
+      expect(newDependencies.updateShouldNotify(oldDependencies), isTrue);
+    });
+
+    test('updateShouldNotify returns false when libraries are the same', () {
+      final library = MockLibrary();
+
+      final oldDependencies = InjectionScope(
+        injection: library,
+        child: const SizedBox(),
+      );
+
+      final newDependencies = InjectionScope(
+        injection: library,
+        child: const SizedBox(),
+      );
+
+      // Проверяем, что updateShouldNotify вернет false, если библиотеки одинаковые
+      expect(newDependencies.updateShouldNotify(oldDependencies), isFalse);
+    });
+
+    testWidgets('maybeOf should return null when library is not found',
+        (tester) async {
+      // Проверяем, что if no Dependencies widget is found, maybeOf returns null.
+      await tester.pumpWidget(
+        Builder(
+          builder: (context) {
+            final library =
+                InjectionScope.maybeOf<MockLibrary>(context, listen: true);
+            expect(library, isNull);
+            return Container();
+          },
+        ),
+      );
+    });
+
     testWidgets('Предоставляет library потомкам', (tester) async {
-      final library = TestDependenciesLibrary();
+      final library = TestInjectionScopeLibrary();
 
       await tester.pumpWidget(
-        Dependencies<TestDependenciesLibrary>(
-          library: library,
+        InjectionScope<TestInjectionScopeLibrary>(
+          injection: library,
           child: Builder(
             builder: (context) {
               final retrievedLibrary =
-                  Dependencies.of<TestDependenciesLibrary>(context);
+                  InjectionScope.of<TestInjectionScopeLibrary>(context);
               expect(retrievedLibrary, equals(library));
               return Container();
             },
@@ -50,12 +122,12 @@ void main() {
 
     testWidgets('Показывает placeholder во время инициализации',
         (tester) async {
-      final library = TestDependenciesLibrary();
+      final library = TestInjectionScopeLibrary();
       const placeholderKey = Key('placeholder');
 
       await tester.pumpWidget(
-        Dependencies<TestDependenciesLibrary>(
-          library: library,
+        InjectionScope<TestInjectionScopeLibrary>(
+          injection: library,
           placeholder: Container(key: placeholderKey),
           child: Container(),
         ),
@@ -70,12 +142,12 @@ void main() {
     });
 
     testWidgets('Child отображается после инициализации', (tester) async {
-      final library = TestDependenciesLibrary();
+      final library = TestInjectionScopeLibrary();
       const childKey = Key('child');
 
       await tester.pumpWidget(
-        Dependencies<TestDependenciesLibrary>(
-          library: library,
+        InjectionScope<TestInjectionScopeLibrary>(
+          injection: library,
           child: const SizedBox(key: childKey),
         ),
       );
@@ -92,7 +164,7 @@ void main() {
         Builder(
           builder: (context) {
             final library =
-                Dependencies.maybeOf<TestDependenciesLibrary>(context);
+                InjectionScope.maybeOf<TestInjectionScopeLibrary>(context);
             expect(library, isNull);
             return Container();
           },
@@ -105,7 +177,7 @@ void main() {
       await tester.pumpWidget(
         Builder(
           builder: (context) {
-            expect(() => Dependencies.of<TestDependenciesLibrary>(context),
+            expect(() => InjectionScope.of<TestInjectionScopeLibrary>(context),
                 throwsArgumentError);
             return Container();
           },
@@ -115,11 +187,11 @@ void main() {
 
     testWidgets('Обрабатывает ошибку инициализации в методе init',
         (tester) async {
-      final library = FaultyDependenciesLibrary();
+      final library = FaultyInjectionScopeLibrary();
 
       await tester.pumpWidget(
-        Dependencies<FaultyDependenciesLibrary>(
-          library: library,
+        InjectionScope<FaultyInjectionScopeLibrary>(
+          injection: library,
           placeholder: Container(key: const Key('placeholder')),
           child:
               Builder(builder: (context) => Container(key: const Key('child'))),

@@ -1,3 +1,11 @@
+## 3.0.0-dev
+
+* Rename classes, all test passed, change readme
+
+## 2.0.3
+
+* Fix dispose
+
 ## 2.0.2
 
 * Fix Example

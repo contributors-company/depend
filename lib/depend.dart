@@ -1,4 +1,5 @@
 library;
 
-export 'src/dependencies.dart';
-export 'src/dependency_library.dart';
+export 'src/injection.dart';
+export 'src/injection_exception.dart';
+export 'src/injection_scope.dart';

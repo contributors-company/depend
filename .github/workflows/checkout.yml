@@ -11,6 +11,11 @@ on:
     paths:
       - 'lib/**'
       - '.github/**'
+  push:
+    branches: [ "dev" ]
+    paths:
+      - 'lib/**'
+      - '.github/**'
 
 jobs:
   checkout:
