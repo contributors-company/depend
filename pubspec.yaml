@@ -1,5 +1,5 @@
 name: depend
-description: "InjectionScope is a library for managing dependencies in Flutter applications. It provides a convenient way to initialize and access services or repositories via an InheritedWidget."
+description: "depend simplifies dependency management in Flutter apps, providing easy initialization and access to services across the widget tree."
 version: 3.0.0-dev
 
 homepage: https://www.contributors.info/repository/depend
