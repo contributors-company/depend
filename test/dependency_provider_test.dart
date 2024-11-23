@@ -2,9 +2,8 @@ import 'package:depend/depend.dart'; // Замените на фактическ
 import 'package:flutter_test/flutter_test.dart';
 
 // Моковый класс для тестирования
-class MockDependenciesLibrary
-    extends DependenciesLibrary<MockDependenciesLibrary> {
-  MockDependenciesLibrary({MockDependenciesLibrary? parent})
+class MockInjectionScopeLibrary extends Injection<MockInjectionScopeLibrary> {
+  MockInjectionScopeLibrary({MockInjectionScopeLibrary? parent})
       : super(parent: parent);
   bool initCalled = false;
 
@@ -17,26 +16,22 @@ class MockDependenciesLibrary
 }
 
 void main() {
-  group('DependenciesLibrary', () {
+  group('InjectionScopeLibrary', () {
     test('Должен вернуть родителя, когда он инициализирован', () async {
-      final parent = MockDependenciesLibrary();
-      final child = MockDependenciesLibrary(parent: parent);
+      final parent = MockInjectionScopeLibrary();
+      final child = MockInjectionScopeLibrary(parent: parent);
       expect(child.parent, equals(parent));
     });
 
     test('Должен бросить исключение, когда родитель равен null', () {
-      final library = MockDependenciesLibrary();
+      final library = MockInjectionScopeLibrary();
 
       expect(() => library.parent, throwsException);
     });
 
     test('Метод init должен быть вызван', () async {
-      final library = MockDependenciesLibrary();
+      final library = MockInjectionScopeLibrary();
       await library.init();
-      await library.log(() async {
-        await Future.delayed(const Duration(milliseconds: 100), () => 1);
-        return null;
-      });
 
       expect(library.initCalled, isTrue);
     });

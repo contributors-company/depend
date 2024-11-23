@@ -3,12 +3,8 @@
 
 ![Pub Version](https://img.shields.io/pub/v/depend)
 ![License](https://img.shields.io/github/license/AlexHCJP/depend)
-![Issues](https://img.shields.io/github/issues/AlexHCJP/depend)
 ![Coverage](https://img.shields.io/codecov/c/github/contributors-company/depend)
 ![Stars](https://img.shields.io/github/stars/AlexHCJP/depend)
-![Contributors](https://img.shields.io/github/contributors/AlexHCJP/depend)
-![Watchers](https://img.shields.io/github/watchers/AlexHCJP/depend)
-![Forks](https://img.shields.io/github/forks/AlexHCJP/depend)
 
 `depend` is a library for managing dependencies in Flutter applications. It provides a convenient way to initialize and access services or repositories via an `InheritedWidget`.
 
@@ -18,22 +14,23 @@
 
 - Initialize dependencies before launching the app
 - Access dependencies from anywhere in the widget tree
-- Log initialization times for each dependency
 - Clean and extensible way to manage dependencies
 - Easy to use and integrate with existing codebases
 
 ---
 
-- [dependencies](#dependencies)
-    - [Why it Rocks 🚀](#why-it-rocks-)
-    - [Installation](#installation)
-    - [Example Usage](#example-usage)
-        - [Example 1: Define Dependencies](#example-1-define-dependencies)
-          - [Step 2: Initialize Dependencies](#step-2-initialize-dependencies)
-          - [Step 3: Access Dependencies with `InheritedWidget`](#step-3-access-dependencies-with-inheritedwidget)
-        - [Example 2: Use Parent Dependencies](#example-2-use-parent-dependencies)
-          - [Step 1: Define Parent Dependencies](#step-1-define-parent-dependencies)
-    - [Logging and Debugging](#logging-and-debugging)
+- **[dependencies](#depend)**
+    - **[Why it Rocks 🚀](#why-it-rocks-)**
+    - **[Installation](#installation)**
+    - **[Example Usage](#example-usage)**
+        - **[Example 1: Define InjectionScope](#example-1-define-injectionscope)**
+            - **[Step 2: Initialize InjectionScope](#step-2-initialize-injectionscope)**
+            - **[Step 3: Access InjectionScope with `InheritedWidget`](#step-3-access-injectionscope-with-inheritedwidget)**
+        - **[Example 2: Use Parent InjectionScope](#example-2-use-parent-injectionscope)**
+            - **[Step 1: Define Parent InjectionScope](#step-1-define-parent-injectionscope)**
+    - **[Migrate v2 to v3](#migrate-from-v2-to-v3)**
+
+---
 
 ## Installation
 
@@ -41,7 +38,7 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  depend: ^0.0.1
+  depend: ^latest_version
 ```
 
 Then run:
@@ -53,32 +50,32 @@ $ flutter pub get
 
 ## Example Usage
 
-### Example 1: Define Dependencies
+### Example 1: Define InjectionScope
 
-#### Step 1: Extends `DependenciesLibrary`
+#### Step 1: Extends `Injection`
 
-Create a `DependenciesLibrary` that extends `DependenciesLibrary` and initializes your dependencies:
+Create a `Injection` that extends `Injection` and initializes your dependencies:
 
 ```dart
-class RootLibrary extends DependenciesLibrary {
+class RootInjection extends Injection {
   late final ApiService apiService;
 
   @override
   Future<void> init() async {
-    await log(() async => apiService = await ApiService().init());
+    apiService = await ApiService().init()
   }
 }
 ```
 
-#### Step 2: Initialize Dependencies
+#### Step 2: Initialize InjectionScope
 
-Use `DependenciesInit` to initialize your dependencies before launching the app:
+Use `InjectionScope` to initialize your dependencies before launching the app:
 
 ```dart
 void main() {
   runApp(
-    Dependencies<RootLibrary>(
-      library: RootLibrary(),
+    InjectionScope<RootInjection>(
+      injection: RootInjection(),
       placeholder: const ColoredBox(
         color: Colors.white,
         child: Center(child: CircularProgressIndicator()),
@@ -89,9 +86,9 @@ void main() {
 }
 ```
 
-#### Step 3: Access Dependencies with `InheritedWidget`
+#### Step 3: Access InjectionScope with `InheritedWidget`
 
-Once initialized, dependencies can be accessed from anywhere in the widget tree using `Dependencies.of(context).authRepository`:
+Once initialized, dependencies can be accessed from anywhere in the widget tree using `InjectionScope.of(context).authRepository`:
 
 ```dart
 
@@ -115,13 +112,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: Dependencies<ModuleLibrary>(
-        library: ModuleLibrary(
-          parent: Dependencies.of<RootLibrary>(context),
+      home: InjectionScope<ModuleInjection>(
+        injection: ModuleInjection(
+          parent: InjectionScope.of<RootInjection>(context),
         ),
         child: BlocProvider(
           create: (context) => DefaultBloc(
-            Dependencies.of<ModuleLibrary>(context).authRepository,
+            InjectionScope.of<ModuleInjection>(context).authRepository,
           ),
           child: const MyHomePage(),
         ),
@@ -172,13 +169,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ```
 
-### Example 2: Use Parent Dependencies
+### Example 2: Use Parent InjectionScope
 
-#### Step 1: Define Parent Dependencies
+#### Step 1: Define Parent InjectionScope
 
 ```dart
 
-class RootLibrary extends DependenciesLibrary {
+class RootInjection extends Injection {
   late final ApiService apiService;
 
   @override
@@ -187,17 +184,17 @@ class RootLibrary extends DependenciesLibrary {
   }
 }
 
-class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
+class ModuleInjection extends Injection<RootInjection> {
   late final AuthRepository authRepository;
 
-  ModuleLibrary({required super.parent});
+  ModuleInjection({required super.parent});
 
   @override
   Future<void> init() async {
     // initialize dependencies
     authRepository = AuthRepository(
       dataSource: AuthDataSource(
-        apiService: parent.apiService, // parent - RootLibrary
+        apiService: parent.apiService, // parent - RootInjection
       ),
     );
   }
@@ -211,35 +208,71 @@ class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
 
 
 ```
+### Migrate from v2 to v3
 
-## Logging and Debugging
+In version 2, dependencies were injected using `Dependencies`, but in version 3, this has been replaced by `InjectionScope`. Here's how you would migrate:
 
-During initialization, each dependency logs the time it took to initialize:
-
+#### v2:
 ```dart
-class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
-  late final AuthRepository authRepository;
+void main() {
+  runApp(
+    Dependencies<RootLibrary>(
+      library: RootLibrary(),
+      placeholder: const ColoredBox(
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      child: const MyApp(),
+    ),
+  );
+}
+```
 
-  ModuleLibrary({required super.parent});
+#### v3:
+```dart
+void main() {
+  runApp(
+    InjectionScope<RootInjection>(
+      injection: RootInjection(),
+      placeholder: const ColoredBox(
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      child: const MyApp(),
+    ),
+  );
+}
+```
+
+The key change is moving from `Dependencies` to `InjectionScope`, reflecting the updated structure for managing and accessing dependencies.
+
+---
+
+### v2:
+```dart
+class RootLibrary extends DependenciesLibrary {
+  late final ApiService apiService;
 
   @override
   Future<void> init() async {
-    await log(() async => authRepository = AuthRepository(
-          dataSource: AuthDataSource(
-            apiService: parent.apiService,
-          ),
-        ),
-    );
+    apiService = await ApiService().init();
   }
 }
 ```
 
+### v3:
 ```dart
-💡 ApiService: initialized successfully for 10 ms
-💡 AuthRepository: initialized successfully for 0 ms
+class RootInjection extends Injection {
+  late final ApiService apiService;
+
+  @override
+  Future<void> init() async {
+    apiService = await ApiService().init();
+  }
+}
 ```
 
-This is useful for tracking performance and initialization times.
+The primary change here is the renaming of `RootLibrary` to `RootInjection`, aligning with the shift in naming conventions from `DependenciesLibrary` in v2 to `Injection` in v3.
 
 ## Codecov
 

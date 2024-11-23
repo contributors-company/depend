@@ -3,32 +3,27 @@ import 'package:example/src/default_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RootLibrary extends DependenciesLibrary {
+class RootInjection extends Injection {
   late final ApiService apiService;
 
   @override
   Future<void> init() async {
-    await log(() async => apiService = await ApiService().init());
+    apiService = await ApiService().init();
   }
 
-  @override
-  dispose() {
-
-  }
 }
 
-class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
+class ModuleInjection extends Injection<RootInjection> {
   late final AuthRepository authRepository;
 
-  ModuleLibrary({required super.parent});
+  ModuleInjection({required super.parent});
 
   @override
   Future<void> init() async {
-    await log(() async => authRepository = AuthRepository(
-          dataSource: AuthDataSource(
-            apiService: parent.apiService,
-          ),
-        ),
+    authRepository = AuthRepository(
+      dataSource: AuthDataSource(
+        apiService: parent.apiService,
+      ),
     );
   }
 
@@ -40,8 +35,8 @@ class ModuleLibrary extends DependenciesLibrary<RootLibrary> {
 
 void main() {
   runApp(
-    Dependencies<RootLibrary>(
-      library: RootLibrary(),
+    InjectionScope<RootInjection>(
+      injection: RootInjection(),
       placeholder: const ColoredBox(
         color: Colors.white,
         child: Center(child: CircularProgressIndicator()),
@@ -89,13 +84,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: Dependencies<ModuleLibrary>(
-        library: ModuleLibrary(
-          parent: Dependencies.of<RootLibrary>(context),
+      home: InjectionScope<ModuleInjection>(
+        injection: ModuleInjection(
+          parent: InjectionScope.of<RootInjection>(context),
         ),
         child: BlocProvider(
           create: (context) => DefaultBloc(
-            Dependencies.of<ModuleLibrary>(context).authRepository,
+            InjectionScope.of<ModuleInjection>(context).authRepository,
           ),
           child: const MyHomePage(),
         ),

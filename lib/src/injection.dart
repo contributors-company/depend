@@ -1,16 +1,17 @@
+import 'package:depend/depend.dart';
 import 'package:flutter/foundation.dart';
 
-/// {@template dependencies_library}
+/// {@template dependencies_Injection}
 /// An abstract class that serves as a base for managing dependencies in your application.
-/// It provides a structure for initializing dependencies and accessing a parent library if needed.
+/// It provides a structure for initializing dependencies and accessing a parent Injection if needed.
 ///
-/// The `DependenciesLibrary` class is designed to be extended by your own dependency library classes,
+/// The `Injection` class is designed to be extended by your own dependency Injection classes,
 /// allowing you to define initialization logic and manage dependencies effectively.
 ///
 /// ### Example
 ///
 /// ```dart
-/// class MyDependencies extends DependenciesLibrary<void> {
+/// class MyInjectionScope extends Injection<void> {
 ///   @override
 ///   Future<void> init() async {
 ///     // Initialize your dependencies here
@@ -22,16 +23,16 @@ import 'package:flutter/foundation.dart';
 /// }
 /// ```
 /// {@endtemplate}
-abstract class DependenciesLibrary<T> {
-  /// Creates a new instance of [DependenciesLibrary].
+abstract class Injection<T> {
+  /// Creates a new instance of [Injection].
   ///
-  /// The optional [parent] parameter allows you to reference a parent dependencies library,
+  /// The optional [parent] parameter allows you to reference a parent dependencies Injection,
   /// enabling hierarchical dependency management.
-  DependenciesLibrary({T? parent}) : _parent = parent;
+  Injection({T? parent}) : _parent = parent;
 
   final T? _parent;
 
-  /// Provides access to the parent dependencies library.
+  /// Provides access to the parent dependencies Injection.
   ///
   /// Throws an [Exception] if the parent is not initialized.
   ///
@@ -43,7 +44,7 @@ abstract class DependenciesLibrary<T> {
   @nonVirtual
   T get parent {
     if (_parent == null) {
-      throw Exception('Parent in $runtimeType is not initialized');
+      throw InjectionException('Parent in $runtimeType is not initialized');
     }
     return _parent!;
   }
@@ -65,12 +66,11 @@ abstract class DependenciesLibrary<T> {
   /// ```
   @mustCallSuper
   Future<void> init();
-  // coverage:ignore-start
 
   /// Cleans up resources used by the dependencies.
   ///
   /// This method can be overridden to release any resources, close streams, or dispose
-  /// of objects that were initialized in the `init` method or elsewhere in the library.
+  /// of objects that were initialized in the `init` method or elsewhere in the Injection.
   ///
   /// The base implementation is empty, so calling `super.dispose()` is optional unless
   /// overridden by subclasses to include specific cleanup logic.
@@ -104,18 +104,4 @@ abstract class DependenciesLibrary<T> {
   ///   return await initializeMyDependency();
   /// });
   /// ```
-  @nonVirtual
-  Future<void> log(Future<Object?> Function() callback) async {
-    if (kReleaseMode) {
-      await callback();
-    } else if (kDebugMode) {
-      final stopWatch = Stopwatch()..start();
-      final result = await callback();
-      stopWatch.stop();
-      debugPrint(
-        '💡${result.runtimeType} initialized successfully in ${stopWatch.elapsedMilliseconds} ms',
-      );
-    }
-  }
-// coverage:ignore-end
 }
