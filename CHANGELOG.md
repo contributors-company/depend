@@ -1,4 +1,4 @@
-## 3.0.0-dev
+## 3.0.0
 
 * Rename classes, all test passed, change readme
 
