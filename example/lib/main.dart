@@ -3,7 +3,7 @@ import 'package:example/src/default_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RootInjection extends Injection {
+class RootInjection extends DependencyContainer {
   late final ApiService apiService;
 
   @override
@@ -13,7 +13,7 @@ class RootInjection extends Injection {
 
 }
 
-class ModuleInjection extends Injection<RootInjection> {
+class ModuleInjection extends DependencyContainer<RootInjection> {
   late final AuthRepository authRepository;
 
   ModuleInjection({required super.parent});
@@ -35,13 +35,13 @@ class ModuleInjection extends Injection<RootInjection> {
 
 void main() {
   runApp(
-    InjectionScope<RootInjection>(
+    DependencyScope<RootInjection>(
       injection: RootInjection(),
       placeholder: const ColoredBox(
         color: Colors.white,
         child: Center(child: CircularProgressIndicator()),
       ),
-      child: const MyApp(),
+      builder: (context) => const MyApp(),
     ),
   );
 }
@@ -84,13 +84,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: InjectionScope<ModuleInjection>(
+      home: DependencyScope<ModuleInjection>(
         injection: ModuleInjection(
-          parent: InjectionScope.of<RootInjection>(context),
+          parent: DependencyProvider.of<RootInjection>(context),
         ),
-        child: BlocProvider(
+        builder: (context) => BlocProvider(
           create: (context) => DefaultBloc(
-            InjectionScope.of<ModuleInjection>(context).authRepository,
+            DependencyProvider.of<ModuleInjection>(context).authRepository,
           ),
           child: const MyHomePage(),
         ),

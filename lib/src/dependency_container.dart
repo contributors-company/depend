@@ -23,12 +23,12 @@ import 'package:flutter/foundation.dart';
 /// }
 /// ```
 /// {@endtemplate}
-abstract class Injection<T> {
-  /// Creates a new instance of [Injection].
+abstract class DependencyContainer<T> {
+  /// Creates a new instance of [DependencyContainer].
   ///
   /// The optional [parent] parameter allows you to reference a parent dependencies Injection,
   /// enabling hierarchical dependency management.
-  Injection({T? parent}) : _parent = parent;
+  DependencyContainer({T? parent}) : _parent = parent;
 
   final T? _parent;
 
@@ -44,7 +44,7 @@ abstract class Injection<T> {
   @nonVirtual
   T get parent {
     if (_parent == null) {
-      throw InjectionException('Parent in $runtimeType is not initialized');
+      throw InjectionException('Parent in $runtimeType is not initialized', stackTrace: StackTrace.current);
     }
     return _parent!;
   }
@@ -91,17 +91,4 @@ abstract class Injection<T> {
   /// ```
   void dispose() {}
 
-  /// Logs the initialization process of a dependency.
-  ///
-  /// This method executes the provided [callback] and logs the time taken to complete it.
-  /// In release mode, the [callback] is executed without logging to avoid performance overhead.
-  /// In debug mode, it measures the execution time and prints it using `debugPrint`.
-  ///
-  /// ### Example
-  ///
-  /// ```dart
-  /// await log(() async {
-  ///   return await initializeMyDependency();
-  /// });
-  /// ```
 }
