@@ -1,3 +1,7 @@
+## 4.0.0
+
+* Big Refactoring
+
 ## 3.0.0
 
 * Rename classes, all test passed, change readme
