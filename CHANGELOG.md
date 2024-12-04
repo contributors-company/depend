@@ -1,7 +1,6 @@
-## 4.0.0-dev
+## 4.0.0
 
 * Big Refactoring
-
 
 ## 3.0.0
 
