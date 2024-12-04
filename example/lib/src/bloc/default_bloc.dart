@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:example/main.dart';
+
+import '../services.dart';
 
 part 'default_event.dart';
 part 'default_state.dart';

@@ -2,93 +2,121 @@ import 'package:depend/depend.dart';
 import 'package:flutter/foundation.dart';
 
 /// {@template dependencies_Injection}
-/// An abstract class that serves as a base for managing dependencies in your application.
-/// It provides a structure for initializing dependencies and accessing a parent Injection if needed.
+/// An abstract class that serves as a foundation for managing dependencies
+/// in a hierarchical and structured way.
 ///
-/// The `Injection` class is designed to be extended by your own dependency Injection classes,
-/// allowing you to define initialization logic and manage dependencies effectively.
+/// The [DependencyContainer] class provides mechanisms for:
+/// - Initializing dependencies via the [init] method.
+/// - Accessing a parent dependency container for hierarchical setups.
+/// - Managing the lifecycle of dependencies, including cleanup with [dispose].
 ///
-/// ### Example
+/// ### Usage
+///
+/// Extend this class to create your own dependency container and implement
+/// initialization and cleanup logic:
 ///
 /// ```dart
-/// class MyInjectionScope extends Injection<void> {
+/// class MyDependencyContainer extends DependencyContainer<void> {
 ///   @override
 ///   Future<void> init() async {
 ///     // Initialize your dependencies here
-///     await log(() async {
-///       // Initialize a specific dependency
-///       return await initializeMyDependency();
-///     });
+///   }
+///
+///   @override
+///   void dispose() {
+///     // Clean up resources
+///     myStreamController.close();
+///     super.dispose();
 ///   }
 /// }
 /// ```
 /// {@endtemplate}
 abstract class DependencyContainer<T> {
-  /// Creates a new instance of [DependencyContainer].
+  /// Creates an instance of [DependencyContainer].
   ///
-  /// The optional [parent] parameter allows you to reference a parent dependencies Injection,
-  /// enabling hierarchical dependency management.
+  /// - The [parent] parameter allows this container to reference another
+  ///   container as its parent, enabling hierarchical dependency setups.
   DependencyContainer({T? parent}) : _parent = parent;
 
   final T? _parent;
 
-  /// Provides access to the parent dependencies Injection.
+  /// Provides access to the parent dependency container.
   ///
-  /// Throws an [Exception] if the parent is not initialized.
+  /// Throws an [InjectionException] if the parent is not set or initialized.
   ///
   /// ### Example
-  ///
   /// ```dart
-  /// final parentLibrary = parent;
+  /// final parentContainer = parent;
   /// ```
   @nonVirtual
   T get parent {
     if (_parent == null) {
-      throw InjectionException('Parent in $runtimeType is not initialized', stackTrace: StackTrace.current);
+      throw InjectionException(
+        'Parent in $runtimeType is not initialized',
+        stackTrace: StackTrace.current,
+      );
     }
     return _parent!;
   }
 
-  /// Initializes the dependencies.
+  /// Tracks whether the container's initialization logic has been executed.
   ///
-  /// This method should be overridden in subclasses to implement the initialization logic
-  /// for your dependencies. The `@mustCallSuper` annotation indicates that if you override
-  /// this method, you should call `super.init()` to ensure proper initialization.
+  /// This ensures that the [init] method is called only once during the
+  /// container's lifecycle.
+  bool _isInitialization = false;
+
+  /// Returns `true` if the container has been initialized.
+  bool get isInitialization => _isInitialization;
+
+  /// The entry point for initializing dependencies within this container.
+  ///
+  /// - This method should be overridden by subclasses to provide custom
+  ///   initialization logic.
+  /// - Ensure you call `super.init()` when overriding to maintain the
+  ///   container's initialization state.
   ///
   /// ### Example
-  ///
   /// ```dart
   /// @override
   /// Future<void> init() async {
   ///   await super.init();
-  ///   // Your initialization code here
+  ///   // Custom initialization logic
+  ///   someDependency = await initializeDependency();
   /// }
   /// ```
   @mustCallSuper
   Future<void> init();
 
-  /// Cleans up resources used by the dependencies.
+  /// A wrapper method that ensures [init] is called only once.
   ///
-  /// This method can be overridden to release any resources, close streams, or dispose
-  /// of objects that were initialized in the `init` method or elsewhere in the Injection.
-  ///
-  /// The base implementation is empty, so calling `super.dispose()` is optional unless
-  /// overridden by subclasses to include specific cleanup logic.
+  /// This method checks if the container is already initialized and skips
+  /// the initialization if it is.
   ///
   /// ### Example
+  /// ```dart
+  /// await dependencyContainer.inject();
+  /// ```
+  Future<void> inject() async {
+    if (_isInitialization) return;
+    _isInitialization = true;
+    await init();
+  }
+
+  /// Cleans up resources or dependencies managed by this container.
   ///
+  /// Override this method to perform any necessary cleanup, such as closing
+  /// streams, canceling timers, or disposing objects.
+  ///
+  /// The base implementation does nothing, so overriding this method is
+  /// optional unless cleanup is required.
+  ///
+  /// ### Example
   /// ```dart
   /// @override
   /// void dispose() {
-  ///   // Close a stream controller
   ///   myStreamController.close();
-  ///
-  ///   // Dispose of other resources
-  ///   someDependency.dispose();
-  ///
   ///   super.dispose();
   /// }
   /// ```
   void dispose() {}
-
 }

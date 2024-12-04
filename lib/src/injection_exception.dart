@@ -41,6 +41,6 @@ class InjectionException implements Exception {
   final StackTrace? stackTrace;
 
   @override
-  String toString() => 'InjectionException: $message${stackTrace != null ? '\n$stackTrace' : ''}';
+  String toString() =>
+      'InjectionException: $message${stackTrace != null ? '\n$stackTrace' : ''}';
 }
-

@@ -1,88 +1,112 @@
 import 'package:depend/depend.dart';
 import 'package:flutter/widgets.dart';
 
-class DependencyProvider<T extends DependencyContainer<Object?>> extends InheritedWidget {
-  /// {@macro dependencies_class}
-  ///
+/// A widget that provides a [DependencyContainer] (or its subclass) to its subtree.
+///
+/// [DependencyProvider] acts as a bridge to pass dependencies down the widget
+/// tree. It allows widgets to access the provided dependency using the static
+/// [of] or [maybeOf] methods.
+///
+/// ### Usage
+///
+/// ```dart
+/// DependencyProvider<MyDependency>(
+///   injection: MyDependency(),
+///   child: MyApp(),
+/// );
+/// ```
+///
+/// Widgets in the subtree can access the dependency as follows:
+///
+/// ```dart
+/// final myDependency = DependencyProvider.of<MyDependency>(context);
+/// ```
+class DependencyProvider<T extends DependencyContainer<Object?>>
+    extends InheritedWidget {
   /// Creates a [DependencyProvider] widget.
   ///
-  /// The [injection] parameter must not be null and is the [Injection]
-  /// instance that will be provided to descendants.
-  ///
-  /// The [child] parameter is the widget below this widget in the tree.
-  ///
-  /// The [placeholder] widget is displayed while the [injection] is initializing.
-  /// If [placeholder] is not provided, [child] is displayed immediately.
+  /// - The [dependency] parameter is the dependency instance to provide to
+  ///   the widget tree. It must not be `null`.
+  /// - Either [builder] or [child] must be provided:
+  ///   - [builder]: A function that returns the child widget. This is useful
+  ///     when the child requires access to the dependency during its creation.
+  ///   - [child]: The widget below this widget in the tree.
   DependencyProvider({
-    required this.injection,
-    required super.child,
+    required this.dependency,
     super.key,
-    this.placeholder,
-  });
+    Widget Function()? builder,
+    Widget? child,
+  }) : super(child: child ?? builder?.call() ?? const Offstage());
 
-  /// The instance of [Injection] to provide to the widget tree.
-  final T injection;
+  /// The dependency instance being provided to the subtree.
+  final T dependency;
 
-  /// An optional widget to display while the [injection] is initializing.
-  final Widget? placeholder;
-
-  /// {@template dependencies_maybe_of}
-  /// Provides the nearest [Injection] of type [T] up the widget tree.
+  /// Provides the nearest [DependencyContainer] of type [T] from the widget tree.
   ///
-  /// Returns `null` if no such [DependencyProvider] is found.
+  /// This method returns `null` if no [DependencyProvider] of the specified
+  /// type is found.
   ///
-  /// The [listen] parameter determines whether the context will rebuild when
-  /// the [DependencyProvider] updates. If [listen] is `true`, the context will
-  /// subscribe to changes; otherwise, it will not.
+  /// - The [listen] parameter determines whether the widget should rebuild
+  ///   when the [DependencyProvider] updates:
+  ///   - If `true`, the context will subscribe to changes and rebuild when
+  ///     the dependency updates.
+  ///   - If `false`, the context will not rebuild when the dependency changes.
   ///
   /// ### Example
   ///
   /// ```dart
-  /// final injection = InjectionScope.maybeOf<MyInjection>(context);
-  /// if (injection != null) {
-  ///   // Use the injection
+  /// final myDependency = DependencyProvider.maybeOf<MyDependency>(context);
+  /// if (myDependency != null) {
+  ///   // Use the dependency
   /// }
   /// ```
-  /// {@endtemplate}
   static T? maybeOf<T extends DependencyContainer<Object?>>(
-      BuildContext context, {
-        bool listen = false,
-      }) =>
+    BuildContext context, {
+    bool listen = false,
+  }) =>
       listen
           ? context
-          .dependOnInheritedWidgetOfExactType<DependencyProvider<T>>()
-          ?.injection
+              .dependOnInheritedWidgetOfExactType<DependencyProvider<T>>()
+              ?.dependency
           : context
-          .getInheritedWidgetOfExactType<DependencyProvider<T>>()
-          ?.injection;
+              .getInheritedWidgetOfExactType<DependencyProvider<T>>()
+              ?.dependency;
 
-  /// {@template dependencies_of}
-  /// Provides the nearest [Injection] of type [T] up the widget tree.
+  /// Provides the nearest [DependencyContainer] of type [T] from the widget tree.
   ///
-  /// Throws an [ArgumentError] if no such [DependencyProvider] is found.
+  /// This method throws an [ArgumentError] if no [DependencyProvider] of the
+  /// specified type is found.
   ///
-  /// The [listen] parameter determines whether the context will rebuild when
-  /// the [DependencyProvider] updates. If [listen] is `true`, the context will
-  /// subscribe to changes; otherwise, it will not.
+  /// - The [listen] parameter determines whether the widget should rebuild
+  ///   when the [DependencyProvider] updates:
+  ///   - If `true`, the context will subscribe to changes and rebuild when
+  ///     the dependency updates.
+  ///   - If `false`, the context will not rebuild when the dependency changes.
   ///
   /// ### Example
   ///
   /// ```dart
-  /// final injection = InjectionScope.of<MyInjection>(context);
-  /// // Use the injection
+  /// final myDependency = DependencyProvider.of<MyDependency>(context);
+  /// // Use the dependency
   /// ```
-  /// {@endtemplate}
   static T of<T extends DependencyContainer<Object?>>(
-      BuildContext context, {
-        bool listen = false,
-      }) =>
+    BuildContext context, {
+    bool listen = false,
+  }) =>
       maybeOf<T>(context, listen: listen) ?? _notFound<T>();
 
-  static Never _notFound<T extends DependencyContainer<Object?>>() => throw ArgumentError(
-      'InjectionScope.of<$T>() called with a context that does not contain an $T.');
+  /// Helper method to throw an error when a dependency of type [T] is not found.
+  static Never _notFound<T extends DependencyContainer<Object?>>() =>
+      throw ArgumentError(
+          'DependencyProvider.of<$T>() called with a context that does not contain an $T.');
 
-
+  /// Determines whether widgets that depend on this [DependencyProvider] should rebuild.
+  ///
+  /// Returns `true` if the provided [dependency] has changed since the last
+  /// build, and `false` otherwise.
+  ///
+  /// This is used by the Flutter framework to optimize widget rebuilding.
   @override
   bool updateShouldNotify(DependencyProvider oldWidget) =>
-      injection != oldWidget.injection;
+      dependency != oldWidget.dependency;
 }

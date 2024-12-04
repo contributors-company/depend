@@ -1,6 +1,6 @@
 name: depend
 description: "depend simplifies dependency management in Flutter apps, providing easy initialization and access to services across the widget tree."
-version: 3.0.0
+version: 4.0.0-dev
 
 homepage: https://www.contributors.info/repository/depend
 
@@ -30,12 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.1.2
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  fake_async: ^1.3.1
   mocktail: ^1.0.4

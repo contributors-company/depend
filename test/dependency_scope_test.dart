@@ -4,9 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 // Фейковая реализация DependencyContainer
-class MockDependencyContainer extends Mock implements DependencyContainer<Object?> {}
+class MockDependencyContainer extends Mock
+    implements DependencyContainer<Object?> {}
 
-class MockExceptionDependencyContainer extends Mock implements DependencyContainer<Object?> {}
+class MockExceptionDependencyContainer extends Mock
+    implements DependencyContainer<Object?> {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,13 +18,14 @@ void main() {
       final mockDependency = MockDependencyContainer();
 
       when(mockDependency.init).thenAnswer((_) async {});
+      when(mockDependency.inject).thenAnswer((_) async {});
 
       // Строим виджет с placeholder
       await tester.pumpWidget(
         DependencyScope<MockDependencyContainer>(
-          injection: mockDependency,
+          dependency: mockDependency,
           builder: (context) => Container(),
-          placeholder: CircularProgressIndicator(),
+          placeholder: const CircularProgressIndicator(),
         ),
       );
 
@@ -39,7 +42,7 @@ void main() {
     testWidgets('renders errorBuilder when init fails', (tester) async {
       final mockDependency = MockExceptionDependencyContainer();
 
-      when(mockDependency.init).thenAnswer((_) async {
+      when(mockDependency.inject).thenAnswer((_) async {
         throw Exception();
       });
 
@@ -47,9 +50,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: DependencyScope<MockExceptionDependencyContainer>(
-            injection: mockDependency,
+            dependency: mockDependency,
             builder: (context) => Container(),
-            errorBuilder: (error) => const Text('Error: Initialization error'),
+            errorBuilder: (context) =>
+                const Text('Error: Initialization error'),
           ),
         ),
       );
@@ -57,27 +61,27 @@ void main() {
       await tester.pumpAndSettle();
 
       // Ожидаем, что будет отображено сообщение об ошибке
-      await expectLater(find.text('Error: Initialization error'), findsOneWidget);
+      await expectLater(
+          find.text('Error: Initialization error'), findsOneWidget);
     });
 
     testWidgets('renders errorBuilder when init fails', (tester) async {
       final mockDependency = MockDependencyContainer();
 
-      when(mockDependency.init).thenAnswer((_) async {
-        throw Exception('Exception');
+      when(mockDependency.inject).thenAnswer((_) async {
+        throw Exception();
       });
 
       // Строим виджет с errorBuilder
       await tester.pumpWidget(
         MaterialApp(
           home: DependencyScope<MockDependencyContainer>(
-            injection: mockDependency,
+            dependency: mockDependency,
             builder: (context) => Container(),
           ),
         ),
       );
       await tester.pumpAndSettle();
-
 
       // Ожидаем, что будет отображено сообщение об ошибке
       await expectLater(find.byType(ErrorWidget), findsOneWidget);
@@ -86,14 +90,15 @@ void main() {
     testWidgets('calls dispose when the widget is disposed', (tester) async {
       final mockDependency = MockDependencyContainer();
 
-
       when(mockDependency.init).thenAnswer((_) async {});
+      when(mockDependency.inject).thenAnswer((_) async {});
+
       when(mockDependency.dispose).thenAnswer((_) async {});
 
       // Строим виджет
       await tester.pumpWidget(
         DependencyScope<MockDependencyContainer>(
-          injection: mockDependency,
+          dependency: mockDependency,
           builder: (context) => Container(),
         ),
       );
@@ -113,15 +118,13 @@ void main() {
       final mockDependency1 = MockDependencyContainer();
       final mockDependency2 = MockDependencyContainer();
 
-
-      when(mockDependency1.init).thenAnswer((_) async {});
-      when(mockDependency2.init).thenAnswer((_) async {});
-
+      when(mockDependency1.inject).thenAnswer((_) async {});
+      when(mockDependency2.inject).thenAnswer((_) async {});
 
       // Строим первый виджет
       await tester.pumpWidget(
         DependencyScope<MockDependencyContainer>(
-          injection: mockDependency1,
+          dependency: mockDependency1,
           builder: (context) => Container(),
         ),
       );
@@ -132,7 +135,7 @@ void main() {
       // Строим новый виджет с другой зависимостью
       await tester.pumpWidget(
         DependencyScope<MockDependencyContainer>(
-          injection: mockDependency2,
+          dependency: mockDependency2,
           builder: (context) => Container(),
         ),
       );
@@ -140,7 +143,6 @@ void main() {
       await tester.pumpAndSettle();
 
       // Проверяем, что инициализация новой зависимости произошла
-
     });
   });
 }

@@ -1,23 +1,20 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:depend/depend.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Тестовая реализация DependencyContainer
-class TestDependencyContainer extends DependencyContainer<TestDependencyContainer?> {
+class TestDependencyContainer
+    extends DependencyContainer<TestDependencyContainer?> {
   TestDependencyContainer({super.parent});
-
-  bool initialized = false;
   bool disposed = false;
-
-  @override
-  Future<void> init() async {
-    initialized = true;
-  }
 
   @override
   void dispose() {
     disposed = true;
     super.dispose();
   }
+
+  @override
+  Future<void> init() async {}
 }
 
 void main() {
@@ -38,11 +35,11 @@ void main() {
     test('should call init and set initialized to true', () async {
       final container = TestDependencyContainer();
 
-      expect(container.initialized, isFalse);
+      expect(container.isInitialization, isFalse);
 
-      await container.init();
+      await container.inject();
 
-      expect(container.initialized, isTrue);
+      expect(container.isInitialization, isTrue);
     });
 
     test('should call dispose and set disposed to true', () {
@@ -60,10 +57,26 @@ void main() {
 
       expect(() => container.parent, throwsA(isA<InjectionException>()));
       try {
-        print(container.parent);
-      } catch(err) {
+        container.parent;
+      } catch (err) {
         expect(err.toString(), isA<String>());
       }
+
+      container.dispose();
+    });
+
+    test('isInitialization', () async {
+      final container = TestDependencyContainer();
+
+      expect(container.isInitialization, isFalse);
+
+      await container.inject();
+
+      expect(container.isInitialization, isTrue);
+
+      await container.inject();
+
+      expect(container.isInitialization, isTrue);
 
       container.dispose();
     });
