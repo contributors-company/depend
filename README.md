@@ -1,6 +1,3 @@
-Here’s the translated and updated `README.md` for the `depend` library:
-
----
 
 # Depend
 
@@ -181,7 +178,3 @@ DependencyScope<RootDependency, RootFactory>(
 ## Code Coverage
 
 ![Codecov](https://codecov.io/gh/contributors-company/depend/graphs/sunburst.svg?token=DITZJ9E9OM)
-
----
-
-This version reflects the latest changes and provides clear guidance for new users.
