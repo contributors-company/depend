@@ -1,7 +1,6 @@
 import 'package:depend/depend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 // Фейковая реализация DependencyContainer
 class MockDependencyContainer extends DependencyContainer {}
@@ -70,7 +69,8 @@ void main() {
       // Строим виджет с errorBuilder
       await tester.pumpWidget(
         MaterialApp(
-          home: DependencyScope<MockExceptionDependencyContainer, MockExceptionDependencyFactory>(
+          home: DependencyScope<MockExceptionDependencyContainer,
+              MockExceptionDependencyFactory>(
             factory: MockExceptionDependencyFactory(),
             builder: (context) => Container(),
           ),
@@ -98,9 +98,6 @@ void main() {
     });
 
     testWidgets('re-initializes when injection changes', (tester) async {
-      final mockDependency1 = MockDependencyContainer();
-      final mockDependency2 = MockDependencyContainer();
-
       // Строим первый виджет
       await tester.pumpWidget(
         DependencyScope<MockDependencyContainer, MockDependencyFactory>(

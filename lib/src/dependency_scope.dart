@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 /// A widget that initializes and provides a [DependencyContainer] to its subtree.
 ///
 /// [DependencyScope] manages the lifecycle of the dependency by:
-/// - Initializing it using the `inject` method.
+/// - Initializing it using the `factory`'s [DependencyFactory.create] method.
 /// - Disposing of it when it is no longer needed or replaced.
 ///
 /// This widget is useful for scoping dependencies to a specific portion of the widget tree.
@@ -12,8 +12,8 @@ import 'package:flutter/widgets.dart';
 /// ### Example
 ///
 /// ```dart
-/// DependencyScope<MyDependency>(
-///   dependency: MyDependency(),
+/// DependencyScope<MyDependency, MyDependencyFactory>(
+///   factory: MyDependencyFactory(),
 ///   placeholder: CircularProgressIndicator(),
 ///   errorBuilder: (error) => Text('Error: $error'),
 ///   builder: (context) {
@@ -26,8 +26,8 @@ class DependencyScope<T extends DependencyContainer,
     F extends DependencyFactory<T>> extends StatefulWidget {
   /// Creates a [DependencyScope] widget.
   ///
-  /// - The [dependency] parameter specifies the [DependencyContainer] instance
-  ///   to be managed and provided to the subtree.
+  /// - The [factory] parameter specifies a [DependencyFactory] that will be used
+  ///   to asynchronously create the [DependencyContainer] instance.
   /// - The [builder] parameter is a function that builds the widget tree once
   ///   the dependency has been initialized.
   /// - The optional [placeholder] is displayed while the dependency is being
@@ -42,6 +42,21 @@ class DependencyScope<T extends DependencyContainer,
     super.key,
   });
 
+  /// A factory that provides the logic to create the dependency asynchronously.
+  ///
+  /// This factory allows the [DependencyScope] to initialize the [DependencyContainer]
+  /// dynamically. If the [factory] changes during the widget's lifecycle, the
+  /// old dependency will be disposed, and a new one will be created.
+  ///
+  /// Example:
+  /// ```dart
+  /// class MyDependencyFactory extends DependencyFactory<MyDependency> {
+  ///   @override
+  ///   Future<MyDependency> create() async {
+  ///     return MyDependency(await fetchConfig());
+  ///   }
+  /// }
+  /// ```
   final F factory;
 
   /// A builder function that constructs the widget tree once the dependency

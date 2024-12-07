@@ -117,7 +117,8 @@ void main() {
               child: Builder(
                 builder: (context) {
                   final dependency =
-                      DependencyProvider.of<MockDependencyContainer>(context, listen: true);
+                      DependencyProvider.of<MockDependencyContainer>(context,
+                          listen: true);
                   return GestureDetector(
                     onTap: () {
                       setState(() {

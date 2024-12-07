@@ -2,7 +2,7 @@ import 'package:depend/depend.dart';
 
 /// An abstract class representing a factory responsible for creating instances of a specific
 /// type of [DependencyContainer].
-/// 
+///
 /// The [DependencyFactory] is designed to define a blueprint for creating dependency containers,
 /// which are typically used for managing application dependencies in a structured and reusable way.
 ///
@@ -36,7 +36,7 @@ import 'package:depend/depend.dart';
 /// ```
 abstract class DependencyFactory<T extends DependencyContainer> {
   /// Asynchronously creates an instance of the dependency container.
-  /// 
+  ///
   /// This method must be implemented by concrete subclasses to define the logic
   /// for constructing the dependency container. This could include any initialization,
   /// such as creating services, loading configurations, or establishing connections.

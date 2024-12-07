@@ -3,8 +3,6 @@
 /// in a hierarchical and structured way.
 ///
 /// The [DependencyContainer] class provides mechanisms for:
-/// - Initializing dependencies via the [init] method.
-/// - Accessing a parent dependency container for hierarchical setups.
 /// - Managing the lifecycle of dependencies, including cleanup with [dispose].
 ///
 /// ### Usage
@@ -13,11 +11,7 @@
 /// initialization and cleanup logic:
 ///
 /// ```dart
-/// class MyDependencyContainer extends DependencyContainer<void> {
-///   @override
-///   Future<void> init() async {
-///     // Initialize your dependencies here
-///   }
+/// class MyDependencyContainer extends DependencyContainer {
 ///
 ///   @override
 ///   void dispose() {

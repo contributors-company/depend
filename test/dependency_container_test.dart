@@ -10,12 +10,10 @@ class TestDependencyContainer extends DependencyContainer {
     disposed = true;
     super.dispose();
   }
-
 }
 
 void main() {
   group('DependencyContainer', () {
-
     test('should call dispose and set disposed to true', () {
       final container = TestDependencyContainer();
 
@@ -25,6 +23,5 @@ void main() {
 
       expect(container.disposed, isTrue);
     });
-
   });
 }
