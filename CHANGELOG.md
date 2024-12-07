@@ -1,3 +1,7 @@
+## 5.0.0
+
+* DependencyFactory for initialize DependencyContainer
+
 ## 5.0.0-dev
 
 * DependencyFactory for initialize DependencyContainer
