@@ -8,7 +8,7 @@
 
 ## From Version 4 to Version 5
 
-### Version 4:
+### Version 5:
 
 ```dart
 class RootFactory extends DependencyFactory<RootDependency> {
@@ -53,7 +53,7 @@ DependencyProvider<RootDependency>(
 
 
 
-### Version 5:
+### Version 4:
 
 ```dart
 DependencyScope<RootDependency>(
