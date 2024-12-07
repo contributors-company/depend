@@ -155,12 +155,6 @@ DependencyScope<RootDependency, RootFactory>(
 [link to migrate versions](MIGRATION.md)
 
 
-#### Key Differences:
-- `InjectionScope` → `DependencyScope`
-- `Injection` → `DependencyContainer`
-- `InjectionScope` → `DependencyProvider`
-
----
 
 ## Code Coverage
 

@@ -1,6 +1,10 @@
-## [v4 to v5](#from-version-4-to-version-5)
-## [v4 to v5](#from-version-3-to-version-4)
+# Migration
+---
 
+## [v4 to v5](#from-version-4-to-version-5)
+## [v3 to v4](#from-version-3-to-version-4)
+
+---
 
 ## From Version 4 to Version 5
 
@@ -86,6 +90,8 @@ context.depend<ModuleDependency>();
 context.dependMaybe<ModuleDependency>();
 ```
 
+---
+
 ## From Version 3 to Version 4
 
 ### Version 3:
@@ -149,3 +155,11 @@ DependencyProvider.maybeOf<ModuleDependency>(context);
 context.depend<ModuleDependency>();
 context.dependMaybe<ModuleDependency>();
 ```
+
+
+#### Key Differences:
+- `InjectionScope` → `DependencyScope`
+- `Injection` → `DependencyContainer`
+- `InjectionScope` → `DependencyProvider`
+
+---
