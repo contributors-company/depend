@@ -24,6 +24,20 @@ Here’s the translated and updated `README.md` for the `depend` library:
 
 ## Table of Contents
 
+1. [Depend](#depend)
+2. [Features 🚀](#features-)
+3. [Installation](#installation)
+4. [Usage Examples](#usage-examples)
+    - [Example 1: Simple Initialization](#example-1-simple-initialization)
+        - [Step 1: Define the Dependency](#step-1-define-the-dependency)
+        - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
+        - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
+        - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
+    - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
+    - [Example 3: `DependencyScope`](#example-3-dependencyscope)
+5. [Migration Guide](#migration-guide)
+6. [Code Coverage](#code-coverage)
+
 ---
 
 ## Installation
@@ -124,20 +138,28 @@ class MyWidget extends StatelessWidget {
 
 ---
 
-### Example 2: 
+### Example 2: `DependencyProvider`
 
 ```dart
 final RootDependency dep = await RootFactory().create();
 
 DependencyProvider<RootDependency>(
   dependency: dep,
-  builder: (context) => YourWidget();
+  builder: () => YourWidget();
   // or
   child: YourWidget()
 )
+
+class YourWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext) {
+    root = DependencyProvider.of<RootDependency>(context);
+    ...
+  }
+}
 ```
 
-### Example 3: DependencyScope
+### Example 3: `DependencyScope`
 
 ```dart
 DependencyScope<RootDependency, RootFactory>(
