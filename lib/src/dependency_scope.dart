@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:depend/depend.dart';
 import 'package:flutter/widgets.dart';
 
@@ -24,8 +22,8 @@ import 'package:flutter/widgets.dart';
 ///   },
 /// );
 /// ```
-class DependencyScope<T extends DependencyContainer<Object?>>
-    extends StatefulWidget {
+class DependencyScope<T extends DependencyContainer,
+    F extends DependencyFactory<T>> extends StatefulWidget {
   /// Creates a [DependencyScope] widget.
   ///
   /// - The [dependency] parameter specifies the [DependencyContainer] instance
@@ -37,15 +35,14 @@ class DependencyScope<T extends DependencyContainer<Object?>>
   /// - The optional [errorBuilder] is called if an error occurs during
   ///   initialization.
   const DependencyScope({
-    required this.dependency,
+    required this.factory,
     required this.builder,
     this.placeholder,
     this.errorBuilder,
     super.key,
   });
 
-  /// The dependency to be managed and provided.
-  final T dependency;
+  final F factory;
 
   /// A builder function that constructs the widget tree once the dependency
   /// has been initialized.
@@ -59,48 +56,47 @@ class DependencyScope<T extends DependencyContainer<Object?>>
   final Widget Function(Object? error)? errorBuilder;
 
   @override
-  State<DependencyScope<T>> createState() => _DependencyScopeState<T>();
+  State<DependencyScope<T, F>> createState() => _DependencyScopeState<T, F>();
 }
 
-class _DependencyScopeState<T extends DependencyContainer<Object?>>
-    extends State<DependencyScope<T>> {
-  late Future<void> _initFuture;
+class _DependencyScopeState<T extends DependencyContainer,
+    F extends DependencyFactory<T>> extends State<DependencyScope<T, F>> {
+  T? _dependency;
 
   @override
   void initState() {
     super.initState();
-    _initFuture = _initializeInit();
   }
 
   @override
-  void didUpdateWidget(covariant DependencyScope<T> oldWidget) {
+  void didUpdateWidget(covariant DependencyScope<T, F> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     // Dispose of the old dependency and initialize the new one if it has changed.
-    if (widget.dependency != oldWidget.dependency) {
-      oldWidget.dependency.dispose();
-      _initFuture = _initializeInit();
+    if (widget.factory != oldWidget.factory) {
+      _dependency?.dispose.call();
     }
   }
 
   @override
   void dispose() {
     // Dispose of the managed dependency when the widget is removed from the tree.
-    widget.dependency.dispose();
+    _dependency?.dispose.call();
     super.dispose();
   }
 
-  /// Initializes the dependency using its [inject] method.
-  Future<void> _initializeInit() => widget.dependency.inject();
-
   @override
-  Widget build(BuildContext context) => FutureBuilder<void>(
-        future: _initFuture,
+  Widget build(BuildContext context) => FutureBuilder<T>(
+        future: widget.factory.create(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             // Display the error widget if an error occurs during initialization.
             return widget.errorBuilder?.call(snapshot.error) ??
                 ErrorWidget(snapshot.error!);
+          }
+
+          if (snapshot.hasData) {
+            _dependency = snapshot.requireData;
           }
 
           return switch (snapshot.connectionState) {
@@ -112,7 +108,7 @@ class _DependencyScopeState<T extends DependencyContainer<Object?>>
 
             // Provide the dependency once initialization is complete.
             ConnectionState.done => DependencyProvider<T>(
-                dependency: widget.dependency,
+                dependency: snapshot.requireData,
                 child: Builder(
                   builder: widget.builder,
                 ),

@@ -14,8 +14,7 @@ extension DependencyContext on BuildContext {
   /// ```dart
   /// MyDependencyContainer myDependency = context.depend<MyDependencyContainer>();
   /// ```
-  T depend<T extends DependencyContainer<Object?>>() =>
-      DependencyProvider.of<T>(this);
+  T depend<T extends DependencyContainer>() => DependencyProvider.of<T>(this);
 
   /// Retrieves a dependency of type [T] from the nearest [DependencyProvider]
   /// in the widget tree, or returns `null` if no matching [DependencyProvider]
@@ -31,6 +30,6 @@ extension DependencyContext on BuildContext {
   ///   // Use the dependency
   /// }
   /// ```
-  T? maybeDepend<T extends DependencyContainer<Object?>>() =>
+  T? maybeDepend<T extends DependencyContainer>() =>
       DependencyProvider.maybeOf<T>(this);
 }

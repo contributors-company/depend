@@ -21,7 +21,7 @@ import 'package:flutter/widgets.dart';
 /// ```dart
 /// final myDependency = DependencyProvider.of<MyDependency>(context);
 /// ```
-class DependencyProvider<T extends DependencyContainer<Object?>>
+class DependencyProvider<T extends DependencyContainer>
     extends InheritedWidget {
   /// Creates a [DependencyProvider] widget.
   ///
@@ -60,7 +60,7 @@ class DependencyProvider<T extends DependencyContainer<Object?>>
   ///   // Use the dependency
   /// }
   /// ```
-  static T? maybeOf<T extends DependencyContainer<Object?>>(
+  static T? maybeOf<T extends DependencyContainer>(
     BuildContext context, {
     bool listen = false,
   }) =>
@@ -89,16 +89,15 @@ class DependencyProvider<T extends DependencyContainer<Object?>>
   /// final myDependency = DependencyProvider.of<MyDependency>(context);
   /// // Use the dependency
   /// ```
-  static T of<T extends DependencyContainer<Object?>>(
+  static T of<T extends DependencyContainer>(
     BuildContext context, {
     bool listen = false,
   }) =>
       maybeOf<T>(context, listen: listen) ?? _notFound<T>();
 
   /// Helper method to throw an error when a dependency of type [T] is not found.
-  static Never _notFound<T extends DependencyContainer<Object?>>() =>
-      throw ArgumentError(
-          'DependencyProvider.of<$T>() called with a context that does not contain an $T.');
+  static Never _notFound<T extends DependencyContainer>() => throw ArgumentError(
+      'DependencyProvider.of<$T>() called with a context that does not contain an $T.');
 
   /// Determines whether widgets that depend on this [DependencyProvider] should rebuild.
   ///

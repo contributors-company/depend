@@ -17,15 +17,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: DependencyScope<RootInjection>(
-        dependency: RootInjection(),
+      home: DependencyScope<RootDependency, RootFactory>(
+        factory: RootFactory(),
         placeholder: const ColoredBox(
           color: Colors.white,
           child: CupertinoActivityIndicator(),
         ),
-        builder: (context) => DependencyScope<ModuleInjection>(
-          dependency: ModuleInjection(
-            parent: DependencyProvider.of<RootInjection>(context),
+        builder: (context) => DependencyScope<ModuleDependency, ModuleFactory>(
+          factory: ModuleFactory(
+            rootInjection: DependencyProvider.of<RootDependency>(context),
           ),
           placeholder: const ColoredBox(
             color: Colors.white,
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           ),
           builder: (context) => BlocProvider(
             create: (context) => DefaultBloc(
-              DependencyProvider.of<ModuleInjection>(context).authRepository,
+              DependencyProvider.of<ModuleDependency>(context).authRepository,
             ),
             child: const MyHomePage(),
           ),

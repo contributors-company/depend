@@ -1,32 +1,46 @@
-
 import 'package:depend/depend.dart';
 import 'package:example/src/services.dart';
 
-class RootInjection extends DependencyContainer<void> {
-  late final ApiService apiService;
+class RootDependency extends DependencyContainer {
+  final ApiService apiService;
 
-  @override
-  Future<void> init() async {
-    apiService = await ApiService().init();
-  }
+  RootDependency({required this.apiService});
 }
 
-class ModuleInjection extends DependencyContainer<RootInjection> {
-  late final AuthRepository authRepository;
+class ModuleDependency extends DependencyContainer {
+  final AuthRepository authRepository;
 
-  ModuleInjection({required super.parent});
-
-  @override
-  Future<void> init() async {
-    authRepository = AuthRepository(
-      dataSource: AuthDataSource(
-        apiService: parent.apiService,
-      ),
-    );
-  }
+  ModuleDependency({required this.authRepository});
 
   @override
   void dispose() {
     authRepository.dispose();
+  }
+}
+
+class RootFactory extends DependencyFactory<RootDependency> {
+  @override
+  Future<RootDependency> create() async {
+    return RootDependency(
+      apiService: await ApiService().init(),
+    );
+  }
+}
+
+class ModuleFactory extends DependencyFactory<ModuleDependency> {
+  final RootDependency _rootInjection;
+
+  ModuleFactory({required RootDependency rootInjection})
+      : _rootInjection = rootInjection;
+
+  @override
+  Future<ModuleDependency> create() async {
+    return ModuleDependency(
+      authRepository: AuthRepository(
+        dataSource: AuthDataSource(
+          apiService: _rootInjection.apiService,
+        ),
+      ),
+    );
   }
 }
