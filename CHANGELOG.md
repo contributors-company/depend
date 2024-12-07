@@ -1,3 +1,7 @@
+## 5.0.0-dev
+
+* DependencyFactory for initialize DependencyContainer
+
 ## 4.0.0
 
 * Big Refactoring
