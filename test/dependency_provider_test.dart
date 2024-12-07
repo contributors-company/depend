@@ -1,34 +1,39 @@
 import 'package:depend/depend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 // Мок зависимости
-class MockDependencyContainer extends Mock
-    implements DependencyContainer<Object?> {
-  late String value;
+class MockDependencyContainer extends DependencyContainer {
+  MockDependencyContainer(this.value);
+
+  String value;
+}
+
+class MockDependencyFactory extends DependencyFactory<MockDependencyContainer> {
+  MockDependencyFactory({this.value = 'Value'});
+
+  final String value;
+
+  @override
+  Future<MockDependencyContainer> create() async =>
+      MockDependencyContainer(value);
 }
 
 void main() {
   group('DependencyScope Tests', () {
     testWidgets('retrieves dependency correctly', (tester) async {
       // Создание контейнера с зависимостью
-      final mockDependency = MockDependencyContainer();
+      final factory = MockDependencyFactory(value: 'Test Dependency');
+      final dependency = await factory.create();
       final k1 = GlobalKey();
       final mkey = GlobalKey();
-
-      when(mockDependency.init).thenAnswer((_) async {
-        mockDependency.value = 'Test Dependency';
-      });
-
-      await mockDependency.init();
 
       // Строим виджет с DependencyScope
       await tester.pumpWidget(
         MaterialApp(
           key: mkey,
           home: DependencyProvider<MockDependencyContainer>(
-              dependency: mockDependency,
+              dependency: dependency,
               child: Builder(
                 builder: (context) {
                   final dependency =
@@ -43,8 +48,7 @@ void main() {
 
       // Проверяем, что текст "Test Dependency" отображается
       expect(find.text('Test Dependency'), findsOneWidget);
-      expect(
-          k1.currentContext!.depend<MockDependencyContainer>(), mockDependency);
+      expect(k1.currentContext!.depend<MockDependencyContainer>(), dependency);
       expect(
           mkey.currentContext?.maybeDepend<MockDependencyContainer>(), isNull);
     });
@@ -94,19 +98,12 @@ void main() {
 
     testWidgets('updateShouldNotify returns true if dependency changes',
         (tester) async {
+      final factory1 = MockDependencyFactory(value: 'Dependency 1');
+      final factory2 = MockDependencyFactory(value: 'Dependency 2');
+
       // Строим виджет с DependencyScope
-      final mockDependency1 = MockDependencyContainer();
-      final mockDependency2 = MockDependencyContainer();
-
-      when(mockDependency1.init).thenAnswer((_) async {
-        mockDependency1.value = 'Dependency 1';
-      });
-      when(mockDependency2.init).thenAnswer((_) async {
-        mockDependency2.value = 'Dependency 2';
-      });
-
-      await mockDependency1.init();
-      await mockDependency2.init();
+      final mockDependency1 = await factory1.create();
+      final mockDependency2 = await factory2.create();
 
       var a = true;
 
@@ -116,23 +113,22 @@ void main() {
           home: StatefulBuilder(
             builder: (context, setState) =>
                 DependencyProvider<MockDependencyContainer>(
-                    dependency: a ? mockDependency1 : mockDependency2,
-                    child: Builder(
-                      builder: (context) {
-                        final dependency =
-                            DependencyProvider.of<MockDependencyContainer>(
-                                context,
-                                listen: true);
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              a = !a;
-                            });
-                          },
-                          child: Text(dependency.value), // Текущая зависимость
-                        );
-                      },
-                    )),
+              dependency: a ? mockDependency1 : mockDependency2,
+              child: Builder(
+                builder: (context) {
+                  final dependency =
+                      DependencyProvider.of<MockDependencyContainer>(context, listen: true);
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        a = !a;
+                      });
+                    },
+                    child: Text(dependency.value), // Текущая зависимость
+                  );
+                },
+              ),
+            ),
           ),
         ),
       );

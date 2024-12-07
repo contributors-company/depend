@@ -24,14 +24,19 @@ Here’s the translated and updated `README.md` for the `depend` library:
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage Examples](#usage-examples)
-  - [Example 1: Simple Initialization](#example-1-simple-initialization)
-  - [Example 2: Parent Dependencies](#example-2-parent-dependencies)
-  - [Example 3: DependencyScope](#example-3-dependencyscope)
-- [Migration Guide](#migration-guide)
-  - [From Version 3 to Version 4](#from-version-3-to-version-4)
-- [Code Coverage](#code-coverage)
+1. [Depend](#depend)
+2. [Features 🚀](#features-)
+3. [Installation](#installation)
+4. [Usage Examples](#usage-examples)
+    - [Example 1: Simple Initialization](#example-1-simple-initialization)
+        - [Step 1: Define the Dependency](#step-1-define-the-dependency)
+        - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
+        - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
+        - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
+    - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
+    - [Example 3: `DependencyScope`](#example-3-dependencyscope)
+5. [Migration Guide](#migration-guide)
+6. [Code Coverage](#code-coverage)
 
 ---
 
@@ -62,12 +67,10 @@ Create a class that extends `DependencyContainer` and initialize your dependenci
 
 ```dart
 class RootDependency extends DependencyContainer {
-  late final ApiService apiService;
+  final ApiService apiService;
 
-  @override
-  Future<void> init() async {
-    apiService = await ApiService().init();
-  }
+  RootDependency({required this.apiService});
+
 
   void dispose() {
     // apiService.dispose()
@@ -75,15 +78,31 @@ class RootDependency extends DependencyContainer {
 }
 ```
 
-#### Step 2: Use `DependencyScope`
+
+#### Step 2: Define the DependencyFactory
+
+Create a class that extends `DependencyContainer` and initialize your dependencies:
+
+```dart
+class RootDependencyFactory extends DependencyFactory<RootDependency> {
+  
+  Future<RootDependency> create() async {
+    return RootDependency(
+      apiService: await ApiService.initialize(),
+    );
+  }
+}
+```
+
+#### Step 3: Use `DependencyScope`
 
 Wrap your app in a `DependencyScope` to provide dependencies:
 
 ```dart
 void main() {
   runApp(
-    DependencyScope<RootDependency>(
-      dependency: RootDependency(),
+    DependencyScope<RootDependency, RootDependencyFactory>(
+      dependency: RootDependencyFactory(),
       placeholder: const Center(child: CircularProgressIndicator()),
       builder: (BuildContext context) => const MyApp(),
     ),
@@ -91,7 +110,7 @@ void main() {
 }
 ```
 
-#### Step 3: Access the Dependency in a Widget
+#### Step 4: Access the Dependency in a Widget
 
 You can now access the dependency using `DependencyProvider` anywhere in the widget tree:
 
@@ -119,145 +138,45 @@ class MyWidget extends StatelessWidget {
 
 ---
 
-### Example 2: Parent Dependencies
-
-#### Step 1: Create the Parent Dependency
+### Example 2: `DependencyProvider`
 
 ```dart
-class RootDependency extends DependencyContainer {
-  late final ApiService apiService;
+final RootDependency dep = await RootFactory().create();
 
+DependencyProvider<RootDependency>(
+  dependency: dep,
+  builder: () => YourWidget();
+  // or
+  child: YourWidget()
+)
+
+class YourWidget extends StatelessWidget {
   @override
-  Future<void> init() async {
-    apiService = await ApiService().init();
+  Widget build(BuildContext) {
+    root = DependencyProvider.of<RootDependency>(context);
+    ...
   }
 }
 ```
 
-#### Step 2: Create the Child Dependency
-
-Use the parent dependency inside the child:
+### Example 3: `DependencyScope`
 
 ```dart
-class ModuleDependency extends DependencyContainer<RootDependency> {
-  late final AuthRepository authRepository;
-
-  ModuleDependency({required super.parent});
-
-  @override
-  Future<void> init() async {
-    authRepository = AuthRepository(
-      apiService: parent.apiService,
-    );
-  }
-}
-```
-
-#### Step 3: Link Both Dependencies
-
-```dart
-void main() {
-  runApp(
-    DependencyScope<RootDependency>(
-      dependency: RootDependency(),
-      builder: (BuildContext context) => DependencyScope<ModuleDependency>(
-        dependency: ModuleDependency(
-          parent: DependencyProvider.of<RootDependency>(context),
-          // or
-          // parent: context.depend<RootDependency>(),
-        ),
-        builder: (BuildContext context) => const MyApp(),
-      ),
-    ),
-  );
-}
-```
-
----
-
-### Example 3: DependencyScope
-
-```dart
-DependencyScope<RootDependency>(
-      dependency: RootDependency(),
+DependencyScope<RootDependency, RootFactory>(
+      factory: RootFactory(),
       builder: (BuildContext context) => Text('Inject'),
       placeholder: Text('Placeholder'),
       errorBuilder: (Object? error) => Text('Error'),
     ),
 ```
 
+
+
 ## Migration Guide
 
-### From Version 3 to Version 4
+[link to migrate versions](MIGRATION.md)
 
-#### Version 3:
 
-```dart
-InjectionScope<RootLibrary>(
-  library: RootLibrary(),
-  placeholder: const Center(child: CircularProgressIndicator()),
-  child: const YourWidget(),
-);
-```
-
-```dart
-class RootInjection extends Injection {
-  late final ApiService apiService;
-
-  @override
-  Future<void> init() async {
-    apiService = await ApiService().init();
-  }
-}
-```
-
-```dart
-InjectionScope.of<ModuleInjection>(context);
-```
-
-#### Version 4:
-
-```dart
-DependencyScope<RootDependency>(
-    dependency: RootDependency(),
-    placeholder: const Center(child: CircularProgressIndicator()),
-    builder: (context) => const YourWidget(),
-);
-```
-
-```dart
-class ModuleDependency extends DependencyContainer<RootDependency> {
-  late final AuthRepository authRepository;
-
-  ModuleDependency({required super.parent});
-
-  @override
-  Future<void> init() async {
-    authRepository = AuthRepository(
-      apiService: parent.apiService,
-    );
-  }
-
-  void dispose() {
-    // authRepository.dispose();
-  }
-}
-```
-
-```dart
-DependencyProvider.of<ModuleDependency>(context);
-DependencyProvider.maybeOf<ModuleDependency>(context);
-// or
-context.depend<ModuleDependency>();
-context.dependMaybe<ModuleDependency>();
-```
-
-#### Key Differences:
-- `InjectionScope` → `DependencyScope`
-- `Injection` → `DependencyContainer`
-- `InjectionScope` → `DependencyProvider`
-
----
 
 ## Code Coverage
 
