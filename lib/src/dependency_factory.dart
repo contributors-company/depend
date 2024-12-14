@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:depend/depend.dart';
 
 /// An abstract class representing a factory responsible for creating instances of a specific
@@ -43,5 +45,5 @@ abstract class DependencyFactory<T extends DependencyContainer> {
   ///
   /// Returns:
   /// - A [Future] that resolves to an instance of [T], the concrete dependency container.
-  Future<T> create();
+  FutureOr<T> create();
 }

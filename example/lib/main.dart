@@ -9,7 +9,6 @@ void main() {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -17,15 +16,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: DependencyScope<RootDependency, RootFactory>(
+      home: DependencyScope<RootContainer, RootFactory>(
         factory: RootFactory(),
         placeholder: const ColoredBox(
           color: Colors.white,
           child: CupertinoActivityIndicator(),
         ),
-        builder: (context) => DependencyScope<ModuleDependency, ModuleFactory>(
-          factory: ModuleFactory(
-            rootInjection: DependencyProvider.of<RootDependency>(context),
+        builder: (context) => DependencyScope<AuthContainer, AuthFactory>(
+          factory: AuthFactory(
+            apiService:
+                DependencyProvider.of<RootContainer>(context).apiService,
           ),
           placeholder: const ColoredBox(
             color: Colors.white,
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           ),
           builder: (context) => BlocProvider(
             create: (context) => DefaultBloc(
-              DependencyProvider.of<ModuleDependency>(context).authRepository,
+              DependencyProvider.of<AuthContainer>(context).authRepository,
             ),
             child: const MyHomePage(),
           ),
@@ -64,7 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               BlocBuilder<DefaultBloc, DefaultState>(
                 builder: (context, state) {
-                  return Text('Login: ${state.authorized}');
+                  return Text(
+                      'Login: ${state.authorized} \n\nToken: ${state.token}');
                 },
               ),
               Builder(

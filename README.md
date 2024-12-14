@@ -1,6 +1,3 @@
-Here’s the translated and updated `README.md` for the `depend` library:
-
----
 
 # Depend
 
@@ -28,13 +25,13 @@ Here’s the translated and updated `README.md` for the `depend` library:
 2. [Features 🚀](#features-)
 3. [Installation](#installation)
 4. [Usage Examples](#usage-examples)
-    - [Example 1: Simple Initialization](#example-1-simple-initialization)
-        - [Step 1: Define the Dependency](#step-1-define-the-dependency)
-        - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
-        - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
-        - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
-    - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
-    - [Example 3: `DependencyScope`](#example-3-dependencyscope)
+   - [Example 1: Simple Initialization](#example-1-simple-initialization)
+      - [Step 1: Define the Dependency](#step-1-define-the-dependency)
+      - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
+      - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
+      - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
+   - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
+   - [Example 3: `DependencyScope`](#example-3-dependencyscope)
 5. [Migration Guide](#migration-guide)
 6. [Code Coverage](#code-coverage)
 
@@ -66,14 +63,14 @@ flutter pub get
 Create a class that extends `DependencyContainer` and initialize your dependencies:
 
 ```dart
-class RootDependency extends DependencyContainer {
+class RootContainer extends DependencyContainer {
   final ApiService apiService;
 
-  RootDependency({required this.apiService});
+  RootContainer({required this.apiService});
 
 
   void dispose() {
-    // apiService.dispose()
+    apiService.dispose();
   }
 }
 ```
@@ -84,12 +81,21 @@ class RootDependency extends DependencyContainer {
 Create a class that extends `DependencyContainer` and initialize your dependencies:
 
 ```dart
-class RootDependencyFactory extends DependencyFactory<RootDependency> {
+class RootDependencyFactory extends DependencyFactory<RootContainer> {
   
-  Future<RootDependency> create() async {
-    return RootDependency(
+  Future<RootContainer> create() async {
+    return RootContainer(
       apiService: await ApiService.initialize(),
     );
+  }
+  
+  
+  // or
+
+  RootContainer create() {
+     return RootContainer(
+        apiService: ApiService.initialize(),
+     );
   }
 }
 ```
@@ -101,10 +107,10 @@ Wrap your app in a `DependencyScope` to provide dependencies:
 ```dart
 void main() {
   runApp(
-    DependencyScope<RootDependency, RootDependencyFactory>(
-      dependency: RootDependencyFactory(),
-      placeholder: const Center(child: CircularProgressIndicator()),
-      builder: (BuildContext context) => const MyApp(),
+    DependencyScope<RootContainer, RootFactory>(
+       factory: RootFactory(), 
+       placeholder: const Center(child: CircularProgressIndicator()), 
+       builder: (BuildContext context) => const MyApp(),
     ),
   );
 }
@@ -118,7 +124,7 @@ You can now access the dependency using `DependencyProvider` anywhere in the wid
 class MyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final apiService = DependencyProvider.of<RootDependency>(context).apiService;
+    final apiService = DependencyProvider.of<RootContainer>(context).apiService;
 
     return FutureBuilder(
       future: apiService.getData(),
@@ -141,9 +147,9 @@ class MyWidget extends StatelessWidget {
 ### Example 2: `DependencyProvider`
 
 ```dart
-final RootDependency dep = await RootFactory().create();
+final RootContainer dep = await RootFactory().create();
 
-DependencyProvider<RootDependency>(
+DependencyProvider<RootContainer>(
   dependency: dep,
   builder: () => YourWidget();
   // or
@@ -153,7 +159,7 @@ DependencyProvider<RootDependency>(
 class YourWidget extends StatelessWidget {
   @override
   Widget build(BuildContext) {
-    root = DependencyProvider.of<RootDependency>(context);
+    root = DependencyProvider.of<RootContainer>(context);
     ...
   }
 }
@@ -162,7 +168,7 @@ class YourWidget extends StatelessWidget {
 ### Example 3: `DependencyScope`
 
 ```dart
-DependencyScope<RootDependency, RootFactory>(
+DependencyScope<RootContainer, RootFactory>(
       factory: RootFactory(),
       builder: (BuildContext context) => Text('Inject'),
       placeholder: Text('Placeholder'),
@@ -174,14 +180,10 @@ DependencyScope<RootDependency, RootFactory>(
 
 ## Migration Guide
 
-[link to migrate versions](MIGRATION.md)
+[link to migrate versions](https://github.com/contributors-company/depend/blob/main/MIGRATION.md)
 
 
 
 ## Code Coverage
 
 ![Codecov](https://codecov.io/gh/contributors-company/depend/graphs/sunburst.svg?token=DITZJ9E9OM)
-
----
-
-This version reflects the latest changes and provides clear guidance for new users.
