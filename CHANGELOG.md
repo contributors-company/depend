@@ -1,6 +1,14 @@
+## 5.0.1
+
+* DependencyFactory method create return FutureOr
+
 ## 5.0.1-dev
 
 * DependencyFactory method create return FutureOr
+
+## 5.0.0
+
+* DependencyFactory for initialize DependencyContainer
 
 ## 5.0.0-dev
 
