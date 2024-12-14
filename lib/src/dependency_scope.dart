@@ -102,7 +102,7 @@ class _DependencyScopeState<T extends DependencyContainer,
 
   @override
   Widget build(BuildContext context) => FutureBuilder<T>(
-        future: widget.factory.create(),
+        future: Future.value(widget.factory.create()),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             // Display the error widget if an error occurs during initialization.

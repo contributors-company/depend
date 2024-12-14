@@ -1,16 +1,17 @@
 import 'package:depend/depend.dart';
 import 'package:example/src/services.dart';
+import 'package:flutter/foundation.dart';
 
-class RootDependency extends DependencyContainer {
+class RootContainer extends DependencyContainer {
   final ApiService apiService;
 
-  RootDependency({required this.apiService});
+  RootContainer({required this.apiService});
 }
 
-class ModuleDependency extends DependencyContainer {
-  final AuthRepository authRepository;
+class AuthContainer extends DependencyContainer {
+  final IAuthRepository authRepository;
 
-  ModuleDependency({required this.authRepository});
+  AuthContainer({required this.authRepository});
 
   @override
   void dispose() {
@@ -18,29 +19,30 @@ class ModuleDependency extends DependencyContainer {
   }
 }
 
-class RootFactory extends DependencyFactory<RootDependency> {
+class RootFactory extends DependencyFactory<RootContainer> {
   @override
-  Future<RootDependency> create() async {
-    return RootDependency(
+  Future<RootContainer> create() async {
+    return RootContainer(
       apiService: await ApiService().init(),
     );
   }
 }
 
-class ModuleFactory extends DependencyFactory<ModuleDependency> {
-  final RootDependency _rootInjection;
+class AuthFactory extends DependencyFactory<AuthContainer> {
+  final ApiService _apiService;
 
-  ModuleFactory({required RootDependency rootInjection})
-      : _rootInjection = rootInjection;
+  AuthFactory({required ApiService apiService}) : _apiService = apiService;
 
   @override
-  Future<ModuleDependency> create() async {
-    return ModuleDependency(
-      authRepository: AuthRepository(
-        dataSource: AuthDataSource(
-          apiService: _rootInjection.apiService,
-        ),
-      ),
+  AuthContainer create() {
+    return AuthContainer(
+      authRepository: kDebugMode
+          ? MockAuthRepository()
+          : AuthRepository(
+              dataSource: AuthDataSource(
+                apiService: _apiService,
+              ),
+            ),
     );
   }
 }

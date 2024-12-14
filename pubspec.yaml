@@ -1,6 +1,6 @@
 name: depend
 description: "depend simplifies dependency management in Flutter apps, providing easy initialization and access to services across the widget tree."
-version: 5.0.0
+version: 5.0.1
 
 homepage: https://www.contributors.info/repository/depend
 
