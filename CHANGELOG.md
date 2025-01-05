@@ -1,3 +1,7 @@
+## 5.0.2
+
+* Change README
+
 ## 5.0.1
 
 * DependencyFactory method create return FutureOr

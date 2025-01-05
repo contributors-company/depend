@@ -1,5 +1,5 @@
-
-# Depend
+![Logo](screenshots/depend-frame.png)
+![Frame](screenshots/contributors.png)
 
 ![Pub Version](https://img.shields.io/pub/v/depend)
 ![License](https://img.shields.io/github/license/AlexHCJP/depend)
@@ -181,8 +181,6 @@ DependencyScope<RootContainer, RootFactory>(
 ## Migration Guide
 
 [link to migrate versions](https://github.com/contributors-company/depend/blob/main/MIGRATION.md)
-
-
 
 ## Code Coverage
 
