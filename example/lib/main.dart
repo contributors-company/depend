@@ -24,8 +24,7 @@ class MyApp extends StatelessWidget {
         ),
         builder: (context) => DependencyScope<AuthContainer, AuthFactory>(
           factory: AuthFactory(
-            apiService:
-                DependencyProvider.of<RootContainer>(context).apiService,
+            DependencyProvider.of<RootContainer>(context).apiService,
           ),
           placeholder: const ColoredBox(
             color: Colors.white,

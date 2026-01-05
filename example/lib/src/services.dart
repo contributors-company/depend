@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 /// The API service for the example
@@ -22,7 +21,8 @@ class AuthDataSource {
 
 /// The repository for the example
 final class AuthRepository extends IAuthRepository {
-  AuthRepository({required this.dataSource}): _stream = StreamController.broadcast();
+  AuthRepository({required this.dataSource})
+      : _stream = StreamController.broadcast();
 
   final AuthDataSource dataSource;
 
@@ -41,7 +41,7 @@ final class AuthRepository extends IAuthRepository {
 }
 
 final class MockAuthRepository extends IAuthRepository {
-  MockAuthRepository(): _stream = StreamController.broadcast();
+  MockAuthRepository() : _stream = StreamController.broadcast();
   final StreamController _stream;
 
   @override
@@ -54,9 +54,7 @@ final class MockAuthRepository extends IAuthRepository {
 
   @override
   Stream get stream => _stream.stream;
-
 }
-
 
 abstract class IAuthRepository {
   Stream get stream;

@@ -21,19 +21,22 @@
 
 ## Table of Contents
 
-1. [Depend](#depend)
-2. [Features 🚀](#features-)
-3. [Installation](#installation)
-4. [Usage Examples](#usage-examples)
-   - [Example 1: Simple Initialization](#example-1-simple-initialization)
-      - [Step 1: Define the Dependency](#step-1-define-the-dependency)
-      - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
-      - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
-      - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
-   - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
-   - [Example 3: `DependencyScope`](#example-3-dependencyscope)
-5. [Migration Guide](#migration-guide)
-6. [Code Coverage](#code-coverage)
+- [Features 🚀](#features-)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+  - [Example 1: Simple Initialization](#example-1-simple-initialization)
+    - [Step 1: Define the Dependency](#step-1-define-the-dependency)
+    - [Step 2: Define the DependencyFactory](#step-2-define-the-dependencyfactory)
+    - [Step 3: Use `DependencyScope`](#step-3-use-dependencyscope)
+    - [Step 4: Access the Dependency in a Widget](#step-4-access-the-dependency-in-a-widget)
+  - [Example 2: `DependencyProvider`](#example-2-dependencyprovider)
+  - [Example 3: `DependencyScope`](#example-3-dependencyscope)
+  - [Example 4: Lazy Initialization](#example-4-lazy-initialization)
+    - [Using `LazyGet` for Synchronous Dependencies](#using-lazyget-for-synchronous-dependencies)
+    - [Using `LazyFutureGet` for Asynchronous Dependencies](#using-lazyfutureget-for-asynchronous-dependencies)
+- [Migration Guide](#migration-guide)
+- [Code Coverage](#code-coverage)
 
 ---
 
@@ -176,7 +179,87 @@ DependencyScope<RootContainer, RootFactory>(
     ),
 ```
 
+---
 
+### Example 4: Lazy Initialization
+
+The library provides `LazyGet` and `LazyFutureGet` classes for lazy initialization of services. Dependencies are created only when they are first accessed, which improves application startup time.
+
+#### Using `LazyGet` for Synchronous Dependencies
+
+```dart
+class RootContainer extends DependencyContainer {
+  // Service will be created only when accessed for the first time
+  final LazyGet<ApiService> apiService = LazyGet(() => ApiService());
+  final LazyGet<DatabaseService> database = LazyGet(() => DatabaseService());
+
+  void dispose() {
+    // Check if the service was initialized before disposing
+    if (apiService._instance != null) {
+      apiService.instance.dispose();
+    }
+  }
+}
+
+// Usage in widgets
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final container = DependencyProvider.of<RootContainer>(context);
+    
+    // ApiService is created only at this moment
+    final api = container.apiService.instance;
+    
+    return Text('Service initialized: ${api.isReady}');
+  }
+}
+```
+
+#### Using `LazyFutureGet` for Asynchronous Dependencies
+
+```dart
+class RootContainer extends DependencyContainer {
+  // Service with async initialization
+  final LazyFutureGet<DatabaseService> database = 
+      LazyFutureGet(() async {
+        final db = DatabaseService();
+        await db.initialize();
+        return db;
+      });
+      
+  final LazyFutureGet<AuthService> authService = 
+      LazyFutureGet(() async => await AuthService.create());
+}
+
+// Usage in widgets
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final container = DependencyProvider.of<RootContainer>(context);
+    
+    return FutureBuilder<DatabaseService>(
+      // Database is initialized only when this widget is built
+      future: container.database.instance,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+        
+        return Text('Database ready: ${snapshot.data?.isConnected}');
+      },
+    );
+  }
+}
+```
+
+**Benefits of Lazy Initialization:**
+
+- **Faster App Startup:** Dependencies are created only when needed
+- **Memory Optimization:** Unused services don't consume memory
+- **Flexible Initialization:** You can control when heavy operations are performed
+- **Simple API:** Easy to use with both sync and async dependencies
+
+---
 
 ## Migration Guide
 

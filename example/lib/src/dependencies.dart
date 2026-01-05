@@ -4,8 +4,14 @@ import 'package:flutter/foundation.dart';
 
 class RootContainer extends DependencyContainer {
   final ApiService apiService;
+  final LazyGet<ApiService> lazyApiService;
+  final LazyFutureGet<ApiService> lazyFutureApiService;
 
-  RootContainer({required this.apiService});
+  RootContainer({
+    required this.apiService,
+    required this.lazyApiService,
+    required this.lazyFutureApiService,
+  });
 }
 
 class AuthContainer extends DependencyContainer {
@@ -22,16 +28,19 @@ class AuthContainer extends DependencyContainer {
 class RootFactory extends DependencyFactory<RootContainer> {
   @override
   Future<RootContainer> create() async {
-    return RootContainer(
-      apiService: await ApiService().init(),
+    final container = RootContainer(
+      apiService: ApiService(),
+      lazyApiService: LazyGet(() => ApiService()),
+      lazyFutureApiService: LazyFutureGet(() => ApiService().init()),
     );
+    return container;
   }
 }
 
 class AuthFactory extends DependencyFactory<AuthContainer> {
   final ApiService _apiService;
 
-  AuthFactory({required ApiService apiService}) : _apiService = apiService;
+  AuthFactory(this._apiService);
 
   @override
   AuthContainer create() {

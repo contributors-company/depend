@@ -1,3 +1,7 @@
+## 5.1.0
+
+* Add lazy initialization dependency
+
 ## 5.0.2
 
 * Change README

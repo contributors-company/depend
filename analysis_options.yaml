@@ -41,7 +41,6 @@ linter:
   rules:
     # Public packages
     public_member_api_docs: true
-    lines_longer_than_120_chars: true
 
     # Enabling rules
     always_use_package_imports: true
@@ -124,7 +123,6 @@ linter:
     unnecessary_statements: true
     unnecessary_string_escapes: true
     unnecessary_string_interpolations: true
-    unsafe_html: true
     use_full_hex_values_for_flutter_colors: true
     use_raw_strings: true
     use_string_buffers: true
@@ -179,7 +177,6 @@ linter:
     non_constant_identifier_names: true
     constant_identifier_names: true
     directives_ordering: true
-    package_api_docs: true
     implementation_imports: true
     prefer_interpolation_to_compose_strings: true
     unnecessary_brace_in_string_interps: true
@@ -202,7 +199,7 @@ linter:
     avoid_private_typedef_functions: true
     avoid_positional_boolean_parameters: true
     hash_and_equals: true
-    avoid_equals_and_hash_code_on_mutable_classes: true/recommended.yaml
+    avoid_equals_and_hash_code_on_mutable_classes: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
