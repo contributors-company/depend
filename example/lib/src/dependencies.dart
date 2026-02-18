@@ -2,6 +2,8 @@ import 'package:depend/depend.dart';
 import 'package:example/src/services.dart';
 import 'package:flutter/foundation.dart';
 
+
+
 class RootContainer extends DependencyContainer {
   final ApiService apiService;
   final LazyGet<ApiService> lazyApiService;
@@ -30,8 +32,8 @@ class RootFactory extends DependencyFactory<RootContainer> {
   Future<RootContainer> create() async {
     final container = RootContainer(
       apiService: ApiService(),
-      lazyApiService: LazyGet(() => ApiService()),
-      lazyFutureApiService: LazyFutureGet(() => ApiService().init()),
+      lazyApiService: lazyGet(() => ApiService()),
+      lazyFutureApiService: lazyFutureGet(ApiService().init),
     );
     return container;
   }

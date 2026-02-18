@@ -92,7 +92,6 @@ class RootDependencyFactory extends DependencyFactory<RootContainer> {
     );
   }
   
-  
   // or
 
   RootContainer create() {
@@ -190,14 +189,16 @@ The library provides `LazyGet` and `LazyFutureGet` classes for lazy initializati
 ```dart
 class RootContainer extends DependencyContainer {
   // Service will be created only when accessed for the first time
-  final LazyGet<ApiService> apiService = LazyGet(() => ApiService());
-  final LazyGet<DatabaseService> database = LazyGet(() => DatabaseService());
+  final LazyGet<ApiService> apiService;
+  final LazyGet<DatabaseService> database;
+}
 
-  void dispose() {
-    // Check if the service was initialized before disposing
-    if (apiService._instance != null) {
-      apiService.instance.dispose();
-    }
+class RootDependencyFactory extends DependencyFactory<RootContainer> {
+  RootContainer create() {
+     return RootContainer(
+        apiService: lazyGet(ApiService.initialize),
+        database: lazyGet(DatabaseService.initialize),
+     );
   }
 }
 
@@ -208,9 +209,9 @@ class MyWidget extends StatelessWidget {
     final container = DependencyProvider.of<RootContainer>(context);
     
     // ApiService is created only at this moment
-    final api = container.apiService.instance;
+    final api = container.apiService();
     
-    return Text('Service initialized: ${api.isReady}');
+    return Text('Service initialized: ${api}'); // Instance: ApiService
   }
 }
 ```
@@ -219,16 +220,18 @@ class MyWidget extends StatelessWidget {
 
 ```dart
 class RootContainer extends DependencyContainer {
-  // Service with async initialization
-  final LazyFutureGet<DatabaseService> database = 
-      LazyFutureGet(() async {
-        final db = DatabaseService();
-        await db.initialize();
-        return db;
-      });
+  final LazyFutureGet<DatabaseService> database;
       
-  final LazyFutureGet<AuthService> authService = 
-      LazyFutureGet(() async => await AuthService.create());
+  final LazyFutureGet<AuthService> authService;
+}
+
+class RootDependencyFactory extends DependencyFactory<RootContainer> {
+  RootContainer create() {
+     return RootContainer(
+        apiService: lazyFutureGet(ApiService.initialize),
+        database: lazyFutureGet(DatabaseService.initialize),
+     );
+  }
 }
 
 // Usage in widgets
@@ -239,7 +242,7 @@ class MyWidget extends StatelessWidget {
     
     return FutureBuilder<DatabaseService>(
       // Database is initialized only when this widget is built
-      future: container.database.instance,
+      future: container.database(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -258,13 +261,3 @@ class MyWidget extends StatelessWidget {
 - **Memory Optimization:** Unused services don't consume memory
 - **Flexible Initialization:** You can control when heavy operations are performed
 - **Simple API:** Easy to use with both sync and async dependencies
-
----
-
-## Migration Guide
-
-[link to migrate versions](https://github.com/contributors-company/depend/blob/main/MIGRATION.md)
-
-## Code Coverage
-
-![Codecov](https://codecov.io/gh/contributors-company/depend/graphs/sunburst.svg?token=DITZJ9E9OM)

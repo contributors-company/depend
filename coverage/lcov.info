@@ -61,3 +61,13 @@ DA:128,2
 LF:30
 LH:30
 end_of_record
+SF:lib/src/lazy_initialize_dependency.dart
+DA:9,0
+DA:11,0
+DA:12,0
+DA:26,0
+DA:28,0
+DA:32,0
+LF:6
+LH:0
+end_of_record
