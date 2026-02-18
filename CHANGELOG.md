@@ -1,3 +1,7 @@
+## 5.1.1
+
+* Refactor lazy initialization
+
 ## 5.1.0
 
 * Add lazy initialization dependency
