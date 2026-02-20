@@ -32,13 +32,13 @@ class RootFactory extends DependencyFactory<RootContainer> {
   Future<RootContainer> create() async {
     final container = RootContainer(
       apiService: ApiService(),
-      lazyApiService: lazyGet(() => ApiService()),
-      lazyFutureApiService: lazyFutureGet(ApiService().init),
+      lazyApiService: LazyGet(() => ApiService()),
+      lazyFutureApiService: LazyFutureGet(ApiService().init),
     );
     return container;
   }
 }
-
+ 
 class AuthFactory extends DependencyFactory<AuthContainer> {
   final ApiService _apiService;
 
