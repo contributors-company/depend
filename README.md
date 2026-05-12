@@ -3,7 +3,7 @@
 
 ![Pub Version](https://img.shields.io/pub/v/depend)
 ![License](https://img.shields.io/github/license/AlexHCJP/depend)
-![Coverage](https://img.shields.io/codecov/c/github/contributors-company/depend)
+![Coverage](https://img.shields.io/codecov/c/github/AlexHCJP/depend)
 ![Stars](https://img.shields.io/github/stars/AlexHCJP/depend)
 
 `depend` is a library for dependency management in Flutter applications. It provides a convenient way to initialize and access services and repositories via `InheritedWidget`.
