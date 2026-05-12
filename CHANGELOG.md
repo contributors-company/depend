@@ -1,3 +1,7 @@
+## 5.1.3
+
+* Test lazy initialization
+
 ## 5.1.2
 
 * Fix lazy initialization
