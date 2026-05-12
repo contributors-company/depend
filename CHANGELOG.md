@@ -1,3 +1,7 @@
+## 5.1.4
+
+* Update version flutter
+
 ## 5.1.3
 
 * Test lazy initialization
