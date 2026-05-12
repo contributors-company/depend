@@ -48,13 +48,16 @@ void main() {
       // Строим виджет с errorBuilder
       await tester.pumpWidget(
         MaterialApp(
-          home: DependencyScope<MockExceptionDependencyContainer,
-              MockExceptionDependencyFactory>(
-            factory: MockExceptionDependencyFactory(),
-            builder: (context) => Container(),
-            errorBuilder: (context) =>
-                const Text('Error: Initialization error'),
-          ),
+          home:
+              DependencyScope<
+                MockExceptionDependencyContainer,
+                MockExceptionDependencyFactory
+              >(
+                factory: MockExceptionDependencyFactory(),
+                builder: (context) => Container(),
+                errorBuilder: (context) =>
+                    const Text('Error: Initialization error'),
+              ),
         ),
       );
 
@@ -62,18 +65,23 @@ void main() {
 
       // Ожидаем, что будет отображено сообщение об ошибке
       await expectLater(
-          find.text('Error: Initialization error'), findsOneWidget);
+        find.text('Error: Initialization error'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders errorBuilder when init fails', (tester) async {
       // Строим виджет с errorBuilder
       await tester.pumpWidget(
         MaterialApp(
-          home: DependencyScope<MockExceptionDependencyContainer,
-              MockExceptionDependencyFactory>(
-            factory: MockExceptionDependencyFactory(),
-            builder: (context) => Container(),
-          ),
+          home:
+              DependencyScope<
+                MockExceptionDependencyContainer,
+                MockExceptionDependencyFactory
+              >(
+                factory: MockExceptionDependencyFactory(),
+                builder: (context) => Container(),
+              ),
         ),
       );
       await tester.pumpAndSettle();

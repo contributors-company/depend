@@ -22,8 +22,11 @@ import 'package:flutter/widgets.dart';
 ///   },
 /// );
 /// ```
-class DependencyScope<T extends DependencyContainer,
-    F extends DependencyFactory<T>> extends StatefulWidget {
+class DependencyScope<
+  T extends DependencyContainer,
+  F extends DependencyFactory<T>
+>
+    extends StatefulWidget {
   /// Creates a [DependencyScope] widget.
   ///
   /// - The [factory] parameter specifies a [DependencyFactory] that will be used
@@ -74,8 +77,11 @@ class DependencyScope<T extends DependencyContainer,
   State<DependencyScope<T, F>> createState() => _DependencyScopeState<T, F>();
 }
 
-class _DependencyScopeState<T extends DependencyContainer,
-    F extends DependencyFactory<T>> extends State<DependencyScope<T, F>> {
+class _DependencyScopeState<
+  T extends DependencyContainer,
+  F extends DependencyFactory<T>
+>
+    extends State<DependencyScope<T, F>> {
   T? _dependency;
 
   @override
@@ -102,33 +108,30 @@ class _DependencyScopeState<T extends DependencyContainer,
 
   @override
   Widget build(BuildContext context) => FutureBuilder<T>(
-        future: Future.value(widget.factory.create()),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            // Display the error widget if an error occurs during initialization.
-            return widget.errorBuilder?.call(snapshot.error) ??
-                ErrorWidget(snapshot.error!);
-          }
+    future: Future.value(widget.factory.create()),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        // Display the error widget if an error occurs during initialization.
+        return widget.errorBuilder?.call(snapshot.error) ??
+            ErrorWidget(snapshot.error!);
+      }
 
-          if (snapshot.hasData) {
-            _dependency = snapshot.requireData;
-          }
+      if (snapshot.hasData) {
+        _dependency = snapshot.requireData;
+      }
 
-          return switch (snapshot.connectionState) {
-            // Show the placeholder while waiting for the dependency to initialize.
-            ConnectionState.none ||
-            ConnectionState.waiting ||
-            ConnectionState.active =>
-              widget.placeholder ?? const SizedBox.shrink(),
+      return switch (snapshot.connectionState) {
+        // Show the placeholder while waiting for the dependency to initialize.
+        ConnectionState.none ||
+        ConnectionState.waiting ||
+        ConnectionState.active => widget.placeholder ?? const SizedBox.shrink(),
 
-            // Provide the dependency once initialization is complete.
-            ConnectionState.done => DependencyProvider<T>(
-                dependency: snapshot.requireData,
-                child: Builder(
-                  builder: widget.builder,
-                ),
-              ),
-          };
-        },
-      );
+        // Provide the dependency once initialization is complete.
+        ConnectionState.done => DependencyProvider<T>(
+          dependency: snapshot.requireData,
+          child: Builder(builder: widget.builder),
+        ),
+      };
+    },
+  );
 }

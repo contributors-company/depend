@@ -63,14 +63,13 @@ class DependencyProvider<T extends DependencyContainer>
   static T? maybeOf<T extends DependencyContainer>(
     BuildContext context, {
     bool listen = false,
-  }) =>
-      listen
-          ? context
-              .dependOnInheritedWidgetOfExactType<DependencyProvider<T>>()
-              ?.dependency
-          : context
-              .getInheritedWidgetOfExactType<DependencyProvider<T>>()
-              ?.dependency;
+  }) => listen
+      ? context
+            .dependOnInheritedWidgetOfExactType<DependencyProvider<T>>()
+            ?.dependency
+      : context
+            .getInheritedWidgetOfExactType<DependencyProvider<T>>()
+            ?.dependency;
 
   /// Provides the nearest [DependencyContainer] of type [T] from the widget tree.
   ///
@@ -92,12 +91,13 @@ class DependencyProvider<T extends DependencyContainer>
   static T of<T extends DependencyContainer>(
     BuildContext context, {
     bool listen = false,
-  }) =>
-      maybeOf<T>(context, listen: listen) ?? _notFound<T>();
+  }) => maybeOf<T>(context, listen: listen) ?? _notFound<T>();
 
   /// Helper method to throw an error when a dependency of type [T] is not found.
-  static Never _notFound<T extends DependencyContainer>() => throw ArgumentError(
-      'DependencyProvider.of<$T>() called with a context that does not contain an $T.');
+  static Never
+  _notFound<T extends DependencyContainer>() => throw ArgumentError(
+    'DependencyProvider.of<$T>() called with a context that does not contain an $T.',
+  );
 
   /// Determines whether widgets that depend on this [DependencyProvider] should rebuild.
   ///

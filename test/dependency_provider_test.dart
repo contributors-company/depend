@@ -33,14 +33,15 @@ void main() {
         MaterialApp(
           key: mkey,
           home: DependencyProvider<MockDependencyContainer>(
-              dependency: dependency,
-              child: Builder(
-                builder: (context) {
-                  final dependency =
-                      DependencyProvider.of<MockDependencyContainer>(context);
-                  return Text(key: k1, dependency.value);
-                },
-              )),
+            dependency: dependency,
+            child: Builder(
+              builder: (context) {
+                final dependency =
+                    DependencyProvider.of<MockDependencyContainer>(context);
+                return Text(key: k1, dependency.value);
+              },
+            ),
+          ),
         ),
       );
 
@@ -50,7 +51,9 @@ void main() {
       expect(find.text('Test Dependency'), findsOneWidget);
       expect(k1.currentContext!.depend<MockDependencyContainer>(), dependency);
       expect(
-          mkey.currentContext?.maybeDepend<MockDependencyContainer>(), isNull);
+        mkey.currentContext?.maybeDepend<MockDependencyContainer>(),
+        isNull,
+      );
     });
 
     testWidgets('throws error when dependency is not found', (tester) async {
@@ -76,8 +79,9 @@ void main() {
       expect(find.byType(ErrorWidget), findsOneWidget);
     });
 
-    testWidgets('maybeOf returns null when dependency is not found',
-        (tester) async {
+    testWidgets('maybeOf returns null when dependency is not found', (
+      tester,
+    ) async {
       // Строим виджет без DependencyScope
       await tester.pumpWidget(
         MaterialApp(
@@ -96,8 +100,9 @@ void main() {
       expect(find.text('No dependency'), findsOneWidget);
     });
 
-    testWidgets('updateShouldNotify returns true if dependency changes',
-        (tester) async {
+    testWidgets('updateShouldNotify returns true if dependency changes', (
+      tester,
+    ) async {
       final factory1 = MockDependencyFactory(value: 'Dependency 1');
       final factory2 = MockDependencyFactory(value: 'Dependency 2');
 
@@ -113,23 +118,25 @@ void main() {
           home: StatefulBuilder(
             builder: (context, setState) =>
                 DependencyProvider<MockDependencyContainer>(
-              dependency: a ? mockDependency1 : mockDependency2,
-              child: Builder(
-                builder: (context) {
-                  final dependency =
-                      DependencyProvider.of<MockDependencyContainer>(context,
-                          listen: true);
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        a = !a;
-                      });
+                  dependency: a ? mockDependency1 : mockDependency2,
+                  child: Builder(
+                    builder: (context) {
+                      final dependency =
+                          DependencyProvider.of<MockDependencyContainer>(
+                            context,
+                            listen: true,
+                          );
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            a = !a;
+                          });
+                        },
+                        child: Text(dependency.value), // Текущая зависимость
+                      );
                     },
-                    child: Text(dependency.value), // Текущая зависимость
-                  );
-                },
-              ),
-            ),
+                  ),
+                ),
           ),
         ),
       );

@@ -2,8 +2,6 @@ import 'package:depend/depend.dart';
 import 'package:example/src/services.dart';
 import 'package:flutter/foundation.dart';
 
-
-
 class RootContainer extends DependencyContainer {
   final ApiService apiService;
   final LazyGet<ApiService> lazyApiService;
@@ -38,7 +36,7 @@ class RootFactory extends DependencyFactory<RootContainer> {
     return container;
   }
 }
- 
+
 class AuthFactory extends DependencyFactory<AuthContainer> {
   final ApiService _apiService;
 

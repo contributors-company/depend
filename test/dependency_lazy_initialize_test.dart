@@ -88,32 +88,35 @@ void main() {
       expect(callCount, 1);
     });
 
-    test('возвращает один и тот же экземпляр при повторных обращениях',
-        () async {
-      final lazy =
-          LazyFutureGet(() async => _AsyncService.init('singleton'));
+    test(
+      'возвращает один и тот же экземпляр при повторных обращениях',
+      () async {
+        final lazy = LazyFutureGet(() async => _AsyncService.init('singleton'));
 
-      final first = await lazy.instance;
-      final second = await lazy.instance;
+        final first = await lazy.instance;
+        final second = await lazy.instance;
 
-      expect(identical(first, second), isTrue);
-    });
+        expect(identical(first, second), isTrue);
+      },
+    );
 
-    test('не создаёт объект более одного раза при последовательных вызовах',
-        () async {
-      var callCount = 0;
+    test(
+      'не создаёт объект более одного раза при последовательных вызовах',
+      () async {
+        var callCount = 0;
 
-      final lazy = LazyFutureGet(() async {
-        callCount++;
-        return _AsyncService.init('test');
-      });
+        final lazy = LazyFutureGet(() async {
+          callCount++;
+          return _AsyncService.init('test');
+        });
 
-      await lazy.instance;
-      await lazy.instance;
-      await lazy.instance;
+        await lazy.instance;
+        await lazy.instance;
+        await lazy.instance;
 
-      expect(callCount, 1);
-    });
+        expect(callCount, 1);
+      },
+    );
 
     test('параллельные вызовы используют один и тот же Future', () async {
       var callCount = 0;
@@ -135,8 +138,7 @@ void main() {
     });
 
     test('возвращает корректное значение из фабрики', () async {
-      final lazy =
-          LazyFutureGet(() async => _AsyncService.init('my-service'));
+      final lazy = LazyFutureGet(() async => _AsyncService.init('my-service'));
 
       final service = await lazy.instance;
 
