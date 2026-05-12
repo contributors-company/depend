@@ -261,3 +261,8 @@ class MyWidget extends StatelessWidget {
 - **Memory Optimization:** Unused services don't consume memory
 - **Flexible Initialization:** You can control when heavy operations are performed
 - **Simple API:** Easy to use with both sync and async dependencies
+
+
+## Codecov
+
+![Codecov](https://codecov.io/gh/AlexHCJP/depend/graphs/sunburst.svg?token=TSI47H2TO4)
