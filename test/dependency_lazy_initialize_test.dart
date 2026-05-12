@@ -1,25 +1,58 @@
 import 'package:depend/depend.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+class _Service {
+  _Service() {
+    initCount++;
+  }
+
+  int initCount = 0;
+}
+
+class _AsyncService {
+  _AsyncService(this.name);
+
+  final String name;
+
+  static Future<_AsyncService> init(String name) async => _AsyncService(name);
+}
+
 void main() {
   group('LazyGet', () {
-    test('does not call factory until instance is accessed', () {
+    test('не вызывает фабрику до первого обращения', () {
       var callCount = 0;
+
       final lazy = LazyGet(() {
         callCount++;
-        return 'value';
+        return _Service();
       });
 
+      // Фабрика ещё не вызвана
       expect(callCount, 0);
+
       lazy.instance;
+
+      // Фабрика вызвана один раз
       expect(callCount, 1);
     });
 
-    test('calls factory only once on multiple accesses', () {
+    test('возвращает один и тот же экземпляр при повторных обращениях', () {
+      final lazy = LazyGet(_Service.new);
+
+      final first = lazy.instance;
+      final second = lazy.instance;
+      final third = lazy.instance;
+
+      expect(identical(first, second), isTrue);
+      expect(identical(second, third), isTrue);
+    });
+
+    test('не создаёт объект более одного раза', () {
       var callCount = 0;
+
       final lazy = LazyGet(() {
         callCount++;
-        return 'value';
+        return _Service();
       });
 
       for (var i = 0; i < 3; i++) {
@@ -29,57 +62,36 @@ void main() {
       expect(callCount, 1);
     });
 
-    test('returns the same instance on every access', () {
-      final lazy = LazyGet(Object.new);
+    test('возвращает корректное значение из фабрики', () {
+      final lazy = LazyGet(_Service.new);
 
-      final first = lazy.instance;
-      final second = lazy.instance;
-
-      expect(identical(first, second), isTrue);
-    });
-
-    test('returns correct value from factory', () {
-      final lazy = LazyGet(() => 42);
-
-      expect(lazy.instance, 42);
-    });
-
-    test('works with complex objects', () {
-      final lazy = LazyGet(() => {'key': 'value'});
-
-      expect(lazy.instance, {'key': 'value'});
+      expect(lazy.instance, isA<_Service>());
+      expect(lazy.instance.initCount, 1);
     });
   });
 
   group('LazyFutureGet', () {
-    test('does not call factory until instance is accessed', () async {
+    test('не вызывает фабрику до первого обращения', () async {
       var callCount = 0;
+
       final lazy = LazyFutureGet(() async {
         callCount++;
-        return 'value';
+        return _AsyncService.init('test');
       });
 
+      // Фабрика ещё не вызвана
       expect(callCount, 0);
+
       await lazy.instance;
+
+      // Фабрика вызвана один раз
       expect(callCount, 1);
     });
 
-    test('calls factory only once on multiple sequential accesses', () async {
-      var callCount = 0;
-      final lazy = LazyFutureGet(() async {
-        callCount++;
-        return 'value';
-      });
-
-      await lazy.instance;
-      await lazy.instance;
-      await lazy.instance;
-
-      expect(callCount, 1);
-    });
-
-    test('returns the same instance on every access', () async {
-      final lazy = LazyFutureGet(() async => Object());
+    test('возвращает один и тот же экземпляр при повторных обращениях',
+        () async {
+      final lazy =
+          LazyFutureGet(() async => _AsyncService.init('singleton'));
 
       final first = await lazy.instance;
       final second = await lazy.instance;
@@ -87,19 +99,31 @@ void main() {
       expect(identical(first, second), isTrue);
     });
 
-    test('returns correct value from factory', () async {
-      final lazy = LazyFutureGet(() async => 99);
-
-      expect(await lazy.instance, 99);
-    });
-
-    test('concurrent calls share the same pending future', () async {
+    test('не создаёт объект более одного раза при последовательных вызовах',
+        () async {
       var callCount = 0;
+
       final lazy = LazyFutureGet(() async {
         callCount++;
-        return 'value';
+        return _AsyncService.init('test');
       });
 
+      await lazy.instance;
+      await lazy.instance;
+      await lazy.instance;
+
+      expect(callCount, 1);
+    });
+
+    test('параллельные вызовы используют один и тот же Future', () async {
+      var callCount = 0;
+
+      final lazy = LazyFutureGet(() async {
+        callCount++;
+        return _AsyncService.init('parallel');
+      });
+
+      // Несколько одновременных обращений — фабрика должна вызваться только один раз
       final results = await Future.wait([
         lazy.instance,
         lazy.instance,
@@ -107,17 +131,17 @@ void main() {
       ]);
 
       expect(callCount, 1);
-      expect(results, ['value', 'value', 'value']);
+      expect(results.every((s) => identical(s, results.first)), isTrue);
     });
 
-    test('resolves correctly after async delay', () async {
-      final lazy = LazyFutureGet(() async {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-        return 'delayed';
-      });
+    test('возвращает корректное значение из фабрики', () async {
+      final lazy =
+          LazyFutureGet(() async => _AsyncService.init('my-service'));
 
-      expect(await lazy.instance, 'delayed');
-      expect(await lazy.instance, 'delayed');
+      final service = await lazy.instance;
+
+      expect(service, isA<_AsyncService>());
+      expect(service.name, 'my-service');
     });
   });
 }
