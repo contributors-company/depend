@@ -18,9 +18,7 @@ funding:
 
 screenshots:
   - description: 'Depend Dependency Injection Logo Flutter'
-    path: screenshots/depend-logo.png
-  - description: 'Frame Depend Dependency Injection Flutter'
-    path: screenshots/depend-frame.png
+    path: logo/depend-logo.png
 
 
 platforms:
