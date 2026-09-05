@@ -1,8 +1,8 @@
 name: depend
 description: "depend simplifies dependency management in Flutter apps, providing easy initialization and access to services across the widget tree."
-version: 5.1.4
+version: 5.1.5
 
-homepage: https://www.contributors.info/repository/depend
+homepage: https://github.com/AlexHCJP/depend
 repository: https://github.com/AlexHCJP/depend
 issue_tracker: https://github.com/AlexHCJP/depend/issues
 
@@ -12,9 +12,6 @@ topics:
   - dependency-injection
   - service
   - dependency-management
-
-funding:
-  - https://www.patreon.com/c/Contributors
 
 screenshots:
   - description: 'Depend Dependency Injection Logo Flutter'

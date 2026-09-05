@@ -1,10 +1,47 @@
 ![Logo](screenshots/depend-frame.png)
 ![Frame](screenshots/contributors.png)
 
-![Pub Version](https://img.shields.io/pub/v/depend)
-![License](https://img.shields.io/github/license/AlexHCJP/depend)
-![Coverage](https://img.shields.io/codecov/c/github/AlexHCJP/depend)
-![Stars](https://img.shields.io/github/stars/AlexHCJP/depend)
+<div align="center">
+  <a href="https://pub.dev/packages/depend">
+    <img src="https://img.shields.io/pub/v/depend?label=Pub&logo=dart" alt="Pub Package" />
+  </a>
+  <a href="https://pub.dev/packages/depend">
+    <img src="https://img.shields.io/pub/likes/depend?style=flat&logo=dart&label=Likes" alt="Pub Likes" />
+  </a>
+  <a href="https://pub.dev/packages/depend/score">
+    <img src="https://img.shields.io/pub/points/depend?label=Score&logo=dart" alt="Pub Score" />
+  </a>
+  <a href="https://pub.dev/packages/depend">
+    <img src="https://img.shields.io/pub/dm/depend?style=flat&color=blue&logo=dart&label=Downloads" alt="Pub Monthly Downloads" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend">
+    <img src="https://img.shields.io/github/stars/AlexHCJP/depend?style=flat&logo=github&colorB=deeppink&label=Stars" alt="Star on Github" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend">
+    <img src="https://img.shields.io/github/forks/AlexHCJP/depend?color=orange&label=Forks&logo=github" alt="Forks on Github" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/AlexHCJP/depend?style=flat&logo=github&colorB=yellow&label=Contributors" alt="Contributors" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend/issues">
+    <img src="https://img.shields.io/github/issues/AlexHCJP/depend?label=Issues&logo=github&color=purple" alt="Issues" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend/actions/workflows/checkout.yml">
+    <img src="https://github.com/AlexHCJP/depend/actions/workflows/checkout.yml/badge.svg" alt="Build Status" />
+  </a>
+  <a href="https://codecov.io/gh/AlexHCJP/depend">
+    <img src="https://img.shields.io/codecov/c/github/AlexHCJP/depend?label=Coverage&logo=codecov" alt="Coverage" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend">
+    <img src="https://img.shields.io/github/languages/code-size/AlexHCJP/depend?logo=github&color=blue&label=Size" alt="Code size" />
+  </a>
+  <a href="https://github.com/AlexHCJP/depend/blob/HEAD/LICENSE">
+    <img src="https://img.shields.io/github/license/AlexHCJP/depend?label=License&color=red&logo=Leanpub" alt="License" />
+  </a>
+  <a href="https://pub.dev/packages/depend">
+    <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20macOS%20%7C%20Windows%20%7C%20Linux-blue.svg?logo=flutter" alt="Platform" />
+  </a>
+</div>
 
 `depend` is a library for dependency management in Flutter applications. It provides a convenient way to initialize and access services and repositories via `InheritedWidget`.
 

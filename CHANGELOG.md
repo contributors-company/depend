@@ -1,3 +1,9 @@
+## 5.1.5
+
+* Fix `homepage`: pointed at `www.contributors.info`, a host that does not resolve; it now points at the repository
+* Drop the `funding` link: the Patreon page it named returns 404
+* Refresh the README badge row
+
 ## 5.1.4
 
 * Update version flutter
